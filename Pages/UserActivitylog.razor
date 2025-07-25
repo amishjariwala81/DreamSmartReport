@@ -1,0 +1,242 @@
+@page "/useractivity"
+
+@inject IJSRuntime JsRuntime
+@inject NavigationManager navigationManager
+@inject SfDialogService sfDialogService
+@inject MyStateContainer myStateContainer
+
+
+@using Syncfusion.Blazor.Popups
+@using Syncfusion.Blazor.DropDowns
+@using Newtonsoft.Json
+@using System.Data;
+@using Syncfusion.Blazor.Layouts
+@using Microsoft.AspNetCore.Components.Rendering;
+@using Microsoft.AspNetCore.Components;
+@using System.Collections.Generic;
+@using Syncfusion.Blazor.Spinner
+@using Syncfusion.Blazor.Grids
+@using JSCoreLibRazor
+@using System.Dynamic
+@using Syncfusion.Blazor.Navigations
+@using Syncfusion.Blazor.Buttons
+
+<div id="page" class="page">
+    <header class="header">
+        <div class="header-icons">
+            <a class="icon" @onclick="BackData">
+                <img src="/Images/icon-header-back.svg">
+            </a>
+        </div>
+        <div class="header-title">
+            <h1>User Activity Log</h1>
+        </div>
+        <div class="header-icons">
+            <a class="icon" @onclick="HomeBtnClick">
+                <img src="/Images/icon-header-home.svg">
+            </a>
+            <a class="icon" href="#" data-bs-toggle="modal" data-bs-target="#exampleModalOne">
+                <img src="/Images/icon-header-exit.svg">
+            </a>
+        </div>
+    </header>
+    <!-- Content : start -->
+    <section class="section content px-2">
+        <div class="reports d-flex flex-column gap-1">
+            <div class="report">
+                <SfSpinner @bind-Visible="@VisibleProperty" Label="Loading...." Type="@SpinnerType.Material">
+                </SfSpinner>
+                @{
+                    var Tool = (new List<string>() { "Search" });
+                }
+       
+                <SfGrid @ref="UserGrid" DataSource="@UserDataSource" ID="Grid" GridLines="GridLine.Both"
+                AllowResizing="true" Toolbar=@Tool AllowGrouping="true" AllowSorting="true"  >
+                    <GridEvents TValue="ExpandoObject" OnActionBegin="GroupActionHandler"
+                                OnActionComplete="GroupActionHandler" OnActionFailure="ActionFailureHandler"></GridEvents>
+                    <GridColumns>
+                            
+                        @foreach (var stru in TblStru)
+                        {
+                            if (stru.DataType == "String")
+                            {
+                                if (stru.FldName == "PtyNm" || stru.FldName == "UserName")
+                                {
+                                    <GridColumn Field=@stru.FldName.Trim() HeaderText=@stru.FldName TextAlign="TextAlign.Left"
+                                                AutoFit = "true" AllowResizing="true" CustomAttributes="@(new Dictionary<string, object>(){ { "class", "e-attr" }})" />
+                                }
+                                else if (stru.FldName == "Date")
+                                {
+                                    <GridColumn Field=@stru.FldName.Trim() HeaderText=@stru.FldName TextAlign="TextAlign.Left" Width="85px" AllowResizing="true" />
+                                }
+                                else
+                                {
+                                    <GridColumn Field=@stru.FldName.Trim() HeaderText=@stru.FldName TextAlign="TextAlign.Left" AutoFit="true" AllowResizing="true" />
+                                }
+                            }
+                            else if (stru.DataType == "Int32")
+                            {
+                                <GridColumn Field=@stru.FldName HeaderText=@stru.FldName TextAlign="TextAlign.Right" AutoFit = "true" AllowResizing="true" />
+                            }
+                            else if (stru.DataType == "Double" || stru.DataType == "Decimal")
+                            {
+                                <GridColumn Field=@stru.FldName HeaderText=@stru.FldName TextAlign="TextAlign.Right" AutoFit="true" AllowResizing="true" />
+                            }
+                            else if (stru.DataType == "DateTime")
+                            {
+                                <GridColumn Field=@stru.FldName HeaderText=@stru.FldName TextAlign="TextAlign.Left" AutoFit="true" AllowResizing="true" Format="d" />
+                            }
+                            else if (stru.DataType == "Boolean")
+                            {
+                                <GridColumn Field=@stru.FldName HeaderText=@stru.FldName DisplayAsCheckBox="true"  />
+                            }
+                        }
+
+                    </GridColumns>
+                </SfGrid>
+            </div>
+        </div>
+    </section>
+    <!-- Content : end -->
+    <!-- Footer : start -->
+    <!-- Footer : end -->
+    <!-- Modal2 : start -->
+    <ExitModal></ExitModal>
+    <!-- Modal2 : end -->
+</div>
+
+<style>
+    .e-grid .e-rowcell.e-attr {
+        white-space: normal;
+    }
+
+</style>
+@* <style type="text/css" class="cssStyles">
+    .e-grid .e-altrow {
+        background-color: lightgray;
+    }
+
+    .e-headercell {
+        color: red;
+        font-size: 5px;
+    }
+     .e-grid .e-groupcaption {
+        font-weight: bold;
+    }
+</style> *@
+
+@code {
+
+    private DSRptDevDet DSRptDevDet;
+    public DataTable? DataTbl = new DataTable();
+    public List<SQLTblFldDef> TblStru = new List<SQLTblFldDef>();
+    private bool VisibleProperty { get; set; } = false;
+    public List<System.Dynamic.ExpandoObject>? UserDataSource;
+    SfGrid<System.Dynamic.ExpandoObject> UserGrid;
+    GetTableData oTblData;
+    public string[] GroupedColumns = new string[] { };
+
+    protected override async Task OnInitializedAsync()
+    {
+        
+        VisibleProperty = true;
+        DSRptDevDet = myStateContainer.Value;
+        ShowUserActivityLog();
+        if(Global.lDetUserActLog)
+        {
+            GroupedColumns = new string[] { "UserRole", "UserName" };
+        }
+        else
+        {
+            GroupedColumns = new string[] { "UserRole" };
+        }
+        VisibleProperty = false;
+    }
+    public void GroupActionHandler(ActionEventArgs<ExpandoObject> args)
+    {
+        var str = args.RequestType;
+        // You can get args.RequestType and other details.
+    }
+    private async void ShowUserActivityLog()
+    {
+        try
+        {
+            if(!Global.lDetUserActLog)
+            {
+                oTblData = new GetTableData
+                {
+                    Query = " WITH CTE( " +
+                            " MobileNo, AppType, Date, Time, PtyNm, UserName, UserRole, AppVer, RowNo) " +
+                            " AS (SELECT MobileNo, AppType,  FORMAT(Date, 'dd/MM/yy') as Date, Time, PtyNm, UserName, UserRole, AppVer, ROW_NUMBER() OVER(PARTITION BY MobileNo " +
+                            " ORDER BY UserName, Date Desc, Time Desc  ) AS RowNo "+
+                            " FROM Logindet where 1 = 1 and AppType = '" + Global.AppType + "') " +
+                            " select * from CTE where RowNo = 1 Order by Date desc, Time Desc " ,
+                    SQLConnStr = Global.MainDBConnStr
+                };
+            }
+            else
+            {
+                oTblData = new GetTableData
+                {
+                    SelectClause = " Mobileno, AppType,  FORMAT(Date, 'dd/MM/yy') as Date, Time, PtyNm, UserName, isnull(UserRole,'') as UserRole, AppVer ",
+                    TableName = " LogInDet ",
+                    WhereCond = " where 1 = 1 and AppType = '" + Global.AppType + "'" + DSRptDevDet.QueryCond,
+                    OrdBy = " order by Date Desc, Time desc ",
+                    SQLConnStr = Global.MainDBConnStr
+                };
+            }
+        
+            string json = JsonConvert.SerializeObject(oTblData);
+            var response = await RazorFunc.CallAPIAsync(Global.APIURL, "GetTableData", json);
+            var respStatusCode = response.StatusCode;
+            if (respStatusCode.ToString() == "OK")
+            {
+                var responseBody = await response.Content.ReadAsStringAsync();
+                var retJSON = JsonConvert.DeserializeObject<RetJSON>(responseBody);
+                if (retJSON.Status.ToString() == "Error")
+                {
+                    await sfDialogService.AlertAsync(retJSON.Msg.ToString() + retJSON.ExError, Global.SfDialogMsg);
+                }
+                else
+                {
+                    TblStru = JsonConvert.DeserializeObject<List<SQLTblFldDef>>(retJSON.AdtData.ToString().Trim());
+                    DataTbl = JsonConvert.DeserializeObject<DataTable>(retJSON.Data.ToString().Trim());
+                    UserDataSource = new List<System.Dynamic.ExpandoObject>();
+                    foreach (DataRow row in DataTbl.Rows)
+                    {
+                        System.Dynamic.ExpandoObject e = new System.Dynamic.ExpandoObject();
+                        foreach (DataColumn col in DataTbl.Columns)
+                        {
+                            e.TryAdd(col.ColumnName, row.ItemArray[col.Ordinal]);
+                        }
+                        UserDataSource.Add(e);
+                    }
+                }
+                VisibleProperty = false;
+            }
+            else
+            {
+                await sfDialogService.AlertAsync(response.ReasonPhrase, Global.SfDialogMsg);
+            }
+            UserGrid.GroupSettings.Columns = GroupedColumns;
+            await UserGrid.Refresh();
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await sfDialogService.AlertAsync("ShowUserActivityLog => " + ex.Message, CoreVars.EXERROR);
+        }
+    }
+    public void BackData()
+    {
+        navigationManager.NavigateTo("/useractlogcrit");
+    }
+    public void HomeBtnClick()
+    {
+        navigationManager.NavigateTo("/dashpgnew");
+    }
+    public void ActionFailureHandler(Syncfusion.Blazor.Grids.FailureEventArgs args)
+    {
+        sfDialogService.AlertAsync("ActionFailureHandler => " + args.Error.Message, CoreVars.ERROR);
+    }
+}

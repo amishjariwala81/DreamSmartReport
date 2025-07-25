@@ -1,0 +1,135 @@
+@page "/olddash"
+@*@page "/dashpgnew/{PartyId:int}"*@
+@inject IJSRuntime JsRuntime
+@inject NavigationManager navigationManager
+@inject SfDialogService sfDialogService
+@inject MyStateContainer myStateContainer
+
+@using Syncfusion.Blazor.Popups
+@using Syncfusion.Blazor.DropDowns
+@using Newtonsoft.Json
+@using System.Data;
+@using Syncfusion.Blazor.Layouts
+@using JSCoreLibRazor
+
+<html>
+
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-light  px-1 fixed-top" style="background-color: lightskyblue">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">
+                    <img src="/Images/jupiter.png" alt="" width="30" height="30" class="d-inline-block align-text-top">
+                    DreamSmart Reports
+                </a>
+            </div>
+        </nav>
+
+        <section style="margin-top:70px" class="px-0">
+            <div class="list-group">
+                <button class="list-group-item list-group-item-action list-group-item-light" style="font-weight:bold" @onclick='DashboardClick'> Dashboard</button>
+                <button class="list-group-item list-group-item-action list-group-item-light" style="font-weight:bold" @onclick='ReportsClick'> Reports</button>
+                <button class="list-group-item list-group-item-action list-group-item-light" style="font-weight:bold" @onclick='SettingsClick'> Settings</button>
+            </div>
+        </section>
+
+    </header>
+
+    <footer>
+        <nav class="navbar navbar-light px-3 fixed-bottom nav justify-content-center " style="background-color: lightskyblue">
+            <div class="position-relative m-3">
+                <span class="navbar-text text-dark">
+                    <a href="tel:0261 2346400" style="text-decoration:none">
+                        <img src="/Images/call.png" alt="" width="24" height="24" class="d-inline-block align-text-top" />
+                        (0261) - 2346400/401/700
+                    </a>
+                </span>
+                <br />
+                <span class="navbar-text text-dark">
+                    <a href="mailto:support@jupitersystems.in" style="text-decoration:none">
+                        <img src="/Images/mail.png" alt="" width="24" height="24" class="d-inline-block align-text-top" />
+                        support@jupitersystems.in
+                    </a>
+                </span>
+                <br />
+                <span class="navbar-text text-dark">
+                    <a href="https://wa.me/918780178336" target="_blank" style="text-decoration:none">
+                        <img src="/Images/whatsapp.png" alt="" width="24" height="24" class="d-inline-block align-text-top" />
+                        +91 7096033271
+                    </a>
+                </span>
+                <br />
+                <span class="navbar-text text-dark">
+                    <img src="/Images/earth.png" alt="" width="24" height="24" class="d-inline-block align-text-top" />
+                    <a href="https://jupitersystems.in" target="_blank" rel="noopener noreferrer" style="text-decoration:none">https://jupitersystems.in</a>
+                </span>
+            </div>
+
+        </nav>
+    </footer>
+</body>
+</html>
+
+@code
+{
+    [Parameter]
+    public int PartyId { get; set; }
+    public string RptType;
+    private DSRptDevDet DSRptDevDet;
+
+    protected override async Task OnInitializedAsync()
+    {
+        DSRptDevDet = myStateContainer.Value;
+        DSRptDevDet DSRptDevDet1 = new DSRptDevDet
+            {
+                //AppType = "DREAMSMART",
+                //DeviceId = "8780178336",
+                AppType = DSRptDevDet.AppType.Trim(),
+                DeviceId = DSRptDevDet.DeviceId.Trim()
+            };
+
+        string json = JsonConvert.SerializeObject(DSRptDevDet1);
+        HttpClient http = new HttpClient();
+        HttpRequestMessage httpRequestMessage = new HttpRequestMessage();
+        httpRequestMessage.Method = new HttpMethod("POST");
+        httpRequestMessage.RequestUri = new Uri("http://116.72.16.122:44332/api/MakePtyDBConn");
+        httpRequestMessage.Content = new StringContent(json);
+        JsonConvert.SerializeObject(DSRptDevDet1);
+        httpRequestMessage.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+        var response = await http.SendAsync(httpRequestMessage);
+        var respStatusCode = response.StatusCode;
+        if (respStatusCode.ToString() == "OK")
+        {
+            var responseBody = await response.Content.ReadAsStringAsync();
+            var retJSON = JsonConvert.DeserializeObject<RetJSON>(responseBody);
+
+            if (retJSON.Status.ToString() == "Error")
+            {
+                await sfDialogService.AlertAsync(retJSON.Msg.ToString() + retJSON.ExError, "Jupiter Data Manager");
+            }
+        }
+    }
+    public void DashboardClick()
+    {
+        DSRptDevDet.ApprType = "D";
+        myStateContainer.SetValue(DSRptDevDet);
+        navigationManager.NavigateTo("/rptList");
+    }
+    public void ReportsClick()
+    {
+        DSRptDevDet.ApprType = "N";
+        myStateContainer.SetValue(DSRptDevDet);
+        navigationManager.NavigateTo("/rptList");
+    }
+    public void SettingsClick()
+    {
+        navigationManager.NavigateTo("/regUser");
+        //navigationManager.NavigateTo("/empregpg");
+    }
+
+
+
+}

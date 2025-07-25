@@ -1,0 +1,730 @@
+@page "/rptviewer"
+@inject SfDialogService sfDialogService
+@inject NavigationManager navigationManager
+@inject IJSRuntime JsRuntime
+@inject MyStateContainer myStateContainer
+
+@using DreamSmart.Services
+@using Newtonsoft.Json
+@using Syncfusion.Blazor.DropDowns;
+@using Syncfusion.Blazor.Popups
+@using System.Data;
+@using Syncfusion.Blazor
+@using Syncfusion.Blazor.Grids
+@using System.ComponentModel.DataAnnotations;
+@using Syncfusion.Blazor.Navigations
+@using System.Dynamic
+@using Syncfusion.Blazor.Spinner
+@using JSCoreLibRazor
+@using Syncfusion.Drawing
+@using Syncfusion.Pdf
+@using Syncfusion.Pdf.Graphics
+@using Syncfusion.Pdf.Grid
+@using Syncfusion.Blazor.Charts
+
+
+
+@*<h3>DisplayEmployee</h3>
+<p>Employee Id: @DSRptDevDet.ApprType</p>
+*@
+
+
+<div id="page" class="page">
+    <header class="header">
+        <div class="header-icons">
+            <a class="icon" onclick="@BackData">
+                @* <img src="/Images/icon-header-back.svg"> *@
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M29.375 20C29.375 20.2984 29.2565 20.5845 29.0455 20.7955C28.8345 21.0065 28.5484 21.125 28.25 21.125H14.4688L19.2988 25.9541C19.5101 26.1654 19.6289 26.4521 19.6289 26.7509C19.6289 27.0498 19.5101 27.3365 19.2988 27.5478C19.0874 27.7592 18.8008 27.8779 18.5019 27.8779C18.203 27.8779 17.9164 27.7592 17.705 27.5478L10.955 20.7978C10.8502 20.6933 10.7669 20.5691 10.7102 20.4324C10.6534 20.2956 10.6241 20.149 10.6241 20.0009C10.6241 19.8529 10.6534 19.7063 10.7102 19.5695C10.7669 19.4328 10.8502 19.3086 10.955 19.2041L17.705 12.4541C17.8097 12.3494 17.9339 12.2664 18.0706 12.2098C18.2074 12.1531 18.3539 12.124 18.5019 12.124C18.6499 12.124 18.7964 12.1531 18.9332 12.2098C19.0699 12.2664 19.1941 12.3494 19.2988 12.4541C19.4034 12.5587 19.4864 12.6829 19.5431 12.8197C19.5997 12.9564 19.6289 13.1029 19.6289 13.2509C19.6289 13.3989 19.5997 13.5455 19.5431 13.6822C19.4864 13.8189 19.4034 13.9432 19.2988 14.0478L14.4688 18.875H28.25C28.5484 18.875 28.8345 18.9935 29.0455 19.2045C29.2565 19.4155 29.375 19.7016 29.375 20Z" fill="white" /></svg>
+            </a>
+        </div>
+
+        <div class="header-title">
+            <h1>@DSRptDevDet.RptName</h1>
+        </div>
+
+        <div class="header-icons">
+            
+            <a class="icon" onclick="@HomeBtnClick">
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M28.7712 17.4547L21.2759 10.3794L21.2609 10.3653C20.9165 10.0501 20.4665 9.87525 19.9995 9.87525C19.5326 9.87525 19.0826 10.0501 18.7381 10.3653L18.7222 10.3794L11.2287 17.4547C11.0387 17.6305 10.887 17.8436 10.7831 18.0808C10.6792 18.3179 10.6254 18.5739 10.625 18.8328V27.5C10.625 27.9973 10.8225 28.4742 11.1742 28.8258C11.5258 29.1775 12.0027 29.375 12.5 29.375H17C17.4973 29.375 17.9742 29.1775 18.3258 28.8258C18.6775 28.4742 18.875 27.9973 18.875 27.5V23.375H21.125V27.5C21.125 27.9973 21.3225 28.4742 21.6742 28.8258C22.0258 29.1775 22.5027 29.375 23 29.375H27.5C27.9973 29.375 28.4742 29.1775 28.8258 28.8258C29.1775 28.4742 29.375 27.9973 29.375 27.5V18.8328C29.3746 18.5739 29.3208 18.3179 29.2169 18.0808C29.113 17.8436 28.9613 17.6305 28.7712 17.4547ZM27.125 27.125H23.375V23C23.375 22.7538 23.3265 22.51 23.2323 22.2825C23.138 22.055 22.9999 21.8483 22.8258 21.6742C22.6517 21.5001 22.445 21.362 22.2175 21.2677C21.99 21.1735 21.7462 21.125 21.5 21.125H18.5C18.0027 21.125 17.5258 21.3225 17.1742 21.6742C16.8225 22.0258 16.625 22.5027 16.625 23V27.125H12.875V18.995L20 12.2684L27.125 18.995V27.125Z" fill="white" /></svg>
+            </a>
+            <a class="icon" onclick="@ShowColumnChooserBtn">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="rgba(255,255,255,1)"><path d="M3 4H21V6H3V4ZM3 11H21V13H3V11ZM3 18H21V20H3V18Z"></path></svg>
+            </a>
+            @* <a class="icon" onclick="@GridPrint">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="rgba(255,255,255,1)"><path d="M7 17H17V22H7V17ZM19 20V15H5V20H3C2.44772 20 2 19.5523 2 19V9C2 8.44772 2.44772 8 3 8H21C21.5523 8 22 8.44772 22 9V19C22 19.5523 21.5523 20 21 20H19ZM5 10V12H8V10H5ZM7 2H17C17.5523 2 18 2.44772 18 3V6H6V3C6 2.44772 6.44772 2 7 2Z"></path></svg>
+            </a> *@
+            <a class="icon" onclick="@onChartClick">
+                @* <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="rgba(255,255,255,1)"><path d="M2 13H8V21H2V13ZM9 3H15V21H9V3ZM16 8H22V21H16V8Z"></path></svg> *@
+                @* <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="rgba(255,255,255,1)"><path d="M3 12H5V21H3V12ZM19 8H21V21H19V8ZM11 2H13V21H11V2Z"></path></svg> *@
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="rgba(255,255,255,1)"><path d="M2 12H4V21H2V12ZM5 14H7V21H5V14ZM16 8H18V21H16V8ZM19 10H21V21H19V10ZM9 2H11V21H9V2ZM12 4H14V21H12V4Z"></path></svg>
+            </a>
+           <a class="icon" onclick="@onPDFClick">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="rgba(255,255,255,1)" xmlns="http://www.w3.org/2000/svg"><path d="M15.625 12.8125V13.4375H16.5625C16.8111 13.4375 17.0496 13.5363 17.2254 13.7121C17.4012 13.8879 17.5 14.1264 17.5 14.375C17.5 14.6236 17.4012 14.8621 17.2254 15.0379C17.0496 15.2137 16.8111 15.3125 16.5625 15.3125H15.625V16.25C15.625 16.4986 15.5262 16.7371 15.3504 16.9129C15.1746 17.0887 14.9361 17.1875 14.6875 17.1875C14.4389 17.1875 14.2004 17.0887 14.0246 16.9129C13.8488 16.7371 13.75 16.4986 13.75 16.25V11.875C13.75 11.6264 13.8488 11.3879 14.0246 11.2121C14.2004 11.0363 14.4389 10.9375 14.6875 10.9375H17.1875C17.4361 10.9375 17.6746 11.0363 17.8504 11.2121C18.0262 11.3879 18.125 11.6264 18.125 11.875C18.125 12.1236 18.0262 12.3621 17.8504 12.5379C17.6746 12.7137 17.4361 12.8125 17.1875 12.8125H15.625ZM7.1875 13.4375C7.1875 14.1005 6.92411 14.7364 6.45527 15.2053C5.98643 15.6741 5.35054 15.9375 4.6875 15.9375H4.375V16.25C4.375 16.4986 4.27623 16.7371 4.10041 16.9129C3.9246 17.0887 3.68614 17.1875 3.4375 17.1875C3.18886 17.1875 2.9504 17.0887 2.77459 16.9129C2.59877 16.7371 2.5 16.4986 2.5 16.25V11.875C2.5 11.6264 2.59877 11.3879 2.77459 11.2121C2.9504 11.0363 3.18886 10.9375 3.4375 10.9375H4.6875C5.35054 10.9375 5.98643 11.2009 6.45527 11.6697C6.92411 12.1386 7.1875 12.7745 7.1875 13.4375ZM5.3125 13.4375C5.3125 13.2717 5.24665 13.1128 5.12944 12.9956C5.01223 12.8783 4.85326 12.8125 4.6875 12.8125H4.375V14.0625H4.6875C4.85326 14.0625 5.01223 13.9967 5.12944 13.8794C5.24665 13.7622 5.3125 13.6033 5.3125 13.4375ZM13.125 14.0625C13.125 14.8913 12.7958 15.6862 12.2097 16.2722C11.6237 16.8583 10.8288 17.1875 10 17.1875H8.75C8.50136 17.1875 8.2629 17.0887 8.08709 16.9129C7.91127 16.7371 7.8125 16.4986 7.8125 16.25V11.875C7.8125 11.6264 7.91127 11.3879 8.08709 11.2121C8.2629 11.0363 8.50136 10.9375 8.75 10.9375H10C10.8288 10.9375 11.6237 11.2667 12.2097 11.8528C12.7958 12.4388 13.125 13.2337 13.125 14.0625ZM11.25 14.0625C11.25 13.731 11.1183 13.413 10.8839 13.1786C10.6495 12.9442 10.3315 12.8125 10 12.8125H9.6875V15.3125H10C10.3315 15.3125 10.6495 15.1808 10.8839 14.9464C11.1183 14.712 11.25 14.394 11.25 14.0625ZM2.8125 8.4375V3.125C2.8125 2.7106 2.97712 2.31317 3.27015 2.02015C3.56317 1.72712 3.9606 1.5625 4.375 1.5625H11.875C11.9982 1.56251 12.1202 1.5868 12.234 1.63398C12.3478 1.68117 12.4512 1.75033 12.5383 1.8375L16.9133 6.2125C17.0889 6.38827 17.1875 6.62656 17.1875 6.875V8.4375C17.1875 8.68614 17.0887 8.9246 16.9129 9.10041C16.7371 9.27623 16.4986 9.375 16.25 9.375C16.0014 9.375 15.7629 9.27623 15.5871 9.10041C15.4113 8.9246 15.3125 8.68614 15.3125 8.4375V8.125H11.5625C11.3139 8.125 11.0754 8.02623 10.8996 7.85041C10.7238 7.6746 10.625 7.43614 10.625 7.1875V3.4375H4.6875V8.4375C4.6875 8.68614 4.58873 8.9246 4.41291 9.10041C4.2371 9.27623 3.99864 9.375 3.75 9.375C3.50136 9.375 3.2629 9.27623 3.08709 9.10041C2.91127 8.9246 2.8125 8.68614 2.8125 8.4375ZM12.5 4.45312V6.25H14.2969L12.5 4.45312Z" fill="white" /></svg>
+            </a>
+            @* <div class="dropdown">
+                <a class="icon" data-bs-toggle="dropdown" aria-expanded="false">
+                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M28.2959 15.455L23.0459 10.205C22.9415 10.1004 22.8174 10.0174 22.6808 9.96078C22.5442 9.90416 22.3978 9.87501 22.25 9.875H13.25C12.7527 9.875 12.2758 10.0725 11.9242 10.4242C11.5725 10.7758 11.375 11.2527 11.375 11.75V28.25C11.375 28.7473 11.5725 29.2242 11.9242 29.5758C12.2758 29.9275 12.7527 30.125 13.25 30.125H26.75C27.2473 30.125 27.7242 29.9275 28.0758 29.5758C28.4275 29.2242 28.625 28.7473 28.625 28.25V16.25C28.625 15.9519 28.5066 15.6659 28.2959 15.455ZM23 13.3438L25.1562 15.5H23V13.3438ZM13.625 27.875V12.125H20.75V16.625C20.75 16.9234 20.8685 17.2095 21.0795 17.4205C21.2905 17.6315 21.5766 17.75 21.875 17.75H26.375V27.875H13.625ZM23.0459 22.2041C23.1508 22.3086 23.234 22.4328 23.2908 22.5695C23.3476 22.7063 23.3768 22.8529 23.3768 23.0009C23.3768 23.149 23.3476 23.2956 23.2908 23.4324C23.234 23.5691 23.1508 23.6933 23.0459 23.7978L20.7959 26.0478C20.6914 26.1527 20.5672 26.2359 20.4305 26.2927C20.2937 26.3495 20.1471 26.3787 19.9991 26.3787C19.851 26.3787 19.7044 26.3495 19.5676 26.2927C19.4309 26.2359 19.3067 26.1527 19.2022 26.0478L16.9522 23.7978C16.7408 23.5865 16.6221 23.2998 16.6221 23.0009C16.6221 22.7021 16.7408 22.4154 16.9522 22.2041C17.1635 21.9927 17.4502 21.874 17.7491 21.874C18.0479 21.874 18.3346 21.9927 18.5459 22.2041L18.875 22.5312V19.625C18.875 19.3266 18.9935 19.0405 19.2045 18.8295C19.4155 18.6185 19.7016 18.5 20 18.5C20.2984 18.5 20.5845 18.6185 20.7955 18.8295C21.0065 19.0405 21.125 19.3266 21.125 19.625V22.5312L21.4541 22.2012C21.5587 22.0968 21.683 22.0141 21.8196 21.9577C21.9563 21.9013 22.1027 21.8724 22.2506 21.8727C22.3984 21.873 22.5448 21.9024 22.6812 21.9592C22.8177 22.0161 22.9416 22.0993 23.0459 22.2041Z" fill="white" /></svg>
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                    <li>
+                        <button class="dropdown-item" @onclick="onPDFClick">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15.625 12.8125V13.4375H16.5625C16.8111 13.4375 17.0496 13.5363 17.2254 13.7121C17.4012 13.8879 17.5 14.1264 17.5 14.375C17.5 14.6236 17.4012 14.8621 17.2254 15.0379C17.0496 15.2137 16.8111 15.3125 16.5625 15.3125H15.625V16.25C15.625 16.4986 15.5262 16.7371 15.3504 16.9129C15.1746 17.0887 14.9361 17.1875 14.6875 17.1875C14.4389 17.1875 14.2004 17.0887 14.0246 16.9129C13.8488 16.7371 13.75 16.4986 13.75 16.25V11.875C13.75 11.6264 13.8488 11.3879 14.0246 11.2121C14.2004 11.0363 14.4389 10.9375 14.6875 10.9375H17.1875C17.4361 10.9375 17.6746 11.0363 17.8504 11.2121C18.0262 11.3879 18.125 11.6264 18.125 11.875C18.125 12.1236 18.0262 12.3621 17.8504 12.5379C17.6746 12.7137 17.4361 12.8125 17.1875 12.8125H15.625ZM7.1875 13.4375C7.1875 14.1005 6.92411 14.7364 6.45527 15.2053C5.98643 15.6741 5.35054 15.9375 4.6875 15.9375H4.375V16.25C4.375 16.4986 4.27623 16.7371 4.10041 16.9129C3.9246 17.0887 3.68614 17.1875 3.4375 17.1875C3.18886 17.1875 2.9504 17.0887 2.77459 16.9129C2.59877 16.7371 2.5 16.4986 2.5 16.25V11.875C2.5 11.6264 2.59877 11.3879 2.77459 11.2121C2.9504 11.0363 3.18886 10.9375 3.4375 10.9375H4.6875C5.35054 10.9375 5.98643 11.2009 6.45527 11.6697C6.92411 12.1386 7.1875 12.7745 7.1875 13.4375ZM5.3125 13.4375C5.3125 13.2717 5.24665 13.1128 5.12944 12.9956C5.01223 12.8783 4.85326 12.8125 4.6875 12.8125H4.375V14.0625H4.6875C4.85326 14.0625 5.01223 13.9967 5.12944 13.8794C5.24665 13.7622 5.3125 13.6033 5.3125 13.4375ZM13.125 14.0625C13.125 14.8913 12.7958 15.6862 12.2097 16.2722C11.6237 16.8583 10.8288 17.1875 10 17.1875H8.75C8.50136 17.1875 8.2629 17.0887 8.08709 16.9129C7.91127 16.7371 7.8125 16.4986 7.8125 16.25V11.875C7.8125 11.6264 7.91127 11.3879 8.08709 11.2121C8.2629 11.0363 8.50136 10.9375 8.75 10.9375H10C10.8288 10.9375 11.6237 11.2667 12.2097 11.8528C12.7958 12.4388 13.125 13.2337 13.125 14.0625ZM11.25 14.0625C11.25 13.731 11.1183 13.413 10.8839 13.1786C10.6495 12.9442 10.3315 12.8125 10 12.8125H9.6875V15.3125H10C10.3315 15.3125 10.6495 15.1808 10.8839 14.9464C11.1183 14.712 11.25 14.394 11.25 14.0625ZM2.8125 8.4375V3.125C2.8125 2.7106 2.97712 2.31317 3.27015 2.02015C3.56317 1.72712 3.9606 1.5625 4.375 1.5625H11.875C11.9982 1.56251 12.1202 1.5868 12.234 1.63398C12.3478 1.68117 12.4512 1.75033 12.5383 1.8375L16.9133 6.2125C17.0889 6.38827 17.1875 6.62656 17.1875 6.875V8.4375C17.1875 8.68614 17.0887 8.9246 16.9129 9.10041C16.7371 9.27623 16.4986 9.375 16.25 9.375C16.0014 9.375 15.7629 9.27623 15.5871 9.10041C15.4113 8.9246 15.3125 8.68614 15.3125 8.4375V8.125H11.5625C11.3139 8.125 11.0754 8.02623 10.8996 7.85041C10.7238 7.6746 10.625 7.43614 10.625 7.1875V3.4375H4.6875V8.4375C4.6875 8.68614 4.58873 8.9246 4.41291 9.10041C4.2371 9.27623 3.99864 9.375 3.75 9.375C3.50136 9.375 3.2629 9.27623 3.08709 9.10041C2.91127 8.9246 2.8125 8.68614 2.8125 8.4375ZM12.5 4.45312V6.25H14.2969L12.5 4.45312Z" fill="#14132B" /></svg>
+                            <span>Download PDF</span>
+                        </button>
+                    </li>
+
+                    <li>
+                        <button class="dropdown-item" @onclick="onExcelClick">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12.5 16.25C12.5 16.4986 12.4012 16.7371 12.2254 16.9129C12.0496 17.0887 11.8111 17.1875 11.5625 17.1875H9.37498C9.12633 17.1875 8.88788 17.0887 8.71206 16.9129C8.53625 16.7371 8.43748 16.4986 8.43748 16.25V11.875C8.43748 11.6264 8.53625 11.3879 8.71206 11.2121C8.88788 11.0363 9.12633 10.9375 9.37498 10.9375C9.62362 10.9375 9.86207 11.0363 10.0379 11.2121C10.2137 11.3879 10.3125 11.6264 10.3125 11.875V15.3125H11.5625C11.8111 15.3125 12.0496 15.4113 12.2254 15.5871C12.4012 15.7629 12.5 16.0014 12.5 16.25ZM7.10935 11.1109C7.00916 11.0391 6.89579 10.9877 6.77572 10.9597C6.65565 10.9318 6.53124 10.9278 6.40961 10.9479C6.28799 10.9681 6.17154 11.0121 6.06693 11.0773C5.96232 11.1425 5.8716 11.2278 5.79998 11.3281L4.99998 12.4484L4.20076 11.3281C4.05572 11.1258 3.83624 10.9894 3.59061 10.9489C3.34498 10.9083 3.09332 10.9671 2.89099 11.1121C2.68866 11.2571 2.55223 11.4766 2.51172 11.7223C2.47121 11.9679 2.52994 12.2195 2.67498 12.4219L3.84685 14.0625L2.67498 15.7031C2.60316 15.8033 2.55178 15.9167 2.52377 16.0367C2.49576 16.1567 2.49166 16.2811 2.51172 16.4027C2.53178 16.5244 2.5756 16.6408 2.64067 16.7455C2.70575 16.8502 2.79081 16.9411 2.89099 17.0129C2.99118 17.0847 3.10452 17.1361 3.22456 17.1641C3.34461 17.1921 3.46899 17.1962 3.59061 17.1761C3.71224 17.1561 3.82872 17.1123 3.93341 17.0472C4.03809 16.9821 4.12894 16.8971 4.20076 16.7969L4.99998 15.6734L5.79998 16.7969C5.94502 16.9992 6.16449 17.1356 6.41012 17.1761C6.65575 17.2167 6.90741 17.1579 7.10974 17.0129C7.31207 16.8679 7.4485 16.6484 7.48901 16.4027C7.52952 16.1571 7.4708 15.9055 7.32576 15.7031L6.15388 14.0625L7.32576 12.4219C7.39788 12.3217 7.44951 12.2082 7.47768 12.088C7.50584 11.9678 7.50999 11.8433 7.48989 11.7215C7.46978 11.5996 7.42581 11.483 7.36051 11.3782C7.29521 11.2735 7.20985 11.1826 7.10935 11.1109ZM16.682 13.6148C16.282 13.3453 15.7976 13.2055 15.3703 13.082C15.1607 13.0254 14.9541 12.9579 14.7515 12.8797C14.9429 12.7875 15.5101 12.7781 16.007 12.9055C16.2435 12.9579 16.4911 12.9168 16.698 12.7907C16.9048 12.6646 17.0548 12.4633 17.1166 12.2291C17.1783 11.9948 17.1469 11.7458 17.0291 11.5341C16.9112 11.3225 16.716 11.1646 16.4844 11.0938C16.1767 11.0179 15.863 10.9692 15.5469 10.9484C14.7711 10.8969 14.1406 11.0328 13.664 11.3523C13.4317 11.5083 13.2365 11.7134 13.0921 11.9532C12.9478 12.193 12.858 12.4615 12.8289 12.7398C12.7429 13.4227 13.0234 14.0109 13.6187 14.3953C13.9922 14.6367 14.4281 14.7625 14.8492 14.8844C15.0836 14.9539 15.4695 15.0641 15.6211 15.1602C15.6184 15.1794 15.6129 15.1981 15.6047 15.2156C15.4976 15.3367 14.8562 15.3555 14.3242 15.2109C14.2049 15.1752 14.0796 15.1636 13.9557 15.1768C13.8319 15.19 13.7119 15.2278 13.6028 15.2879C13.4937 15.348 13.3976 15.4293 13.3203 15.5269C13.2429 15.6246 13.1858 15.7367 13.1523 15.8566C13.1188 15.9766 13.1095 16.102 13.125 16.2257C13.1405 16.3493 13.1804 16.4685 13.2426 16.5765C13.3047 16.6845 13.3877 16.779 13.4868 16.8545C13.5858 16.9301 13.6989 16.9851 13.8195 17.0164C14.2325 17.1276 14.6582 17.1851 15.0859 17.1875C15.5906 17.1875 16.1586 17.0961 16.6273 16.7852C16.8647 16.6282 17.0644 16.4208 17.2123 16.1777C17.3602 15.9346 17.4525 15.6618 17.4828 15.3789C17.5781 14.6508 17.2914 14.0258 16.6804 13.6148H16.682ZM2.81248 8.4375V3.125C2.81248 2.7106 2.9771 2.31317 3.27012 2.02015C3.56315 1.72712 3.96057 1.5625 4.37498 1.5625H11.875C11.9981 1.5624 12.1201 1.58657 12.2339 1.63362C12.3477 1.68067 12.4511 1.74969 12.5383 1.83672L16.9133 6.21172C17.0003 6.29885 17.0693 6.40227 17.1164 6.51608C17.1634 6.62989 17.1876 6.75185 17.1875 6.875V8.4375C17.1875 8.68614 17.0887 8.9246 16.9129 9.10041C16.7371 9.27623 16.4986 9.375 16.25 9.375C16.0013 9.375 15.7629 9.27623 15.5871 9.10041C15.4112 8.9246 15.3125 8.68614 15.3125 8.4375V8.125H11.5625C11.3138 8.125 11.0754 8.02623 10.8996 7.85041C10.7237 7.6746 10.625 7.43614 10.625 7.1875V3.4375H4.68748V8.4375C4.68748 8.68614 4.5887 8.9246 4.41289 9.10041C4.23707 9.27623 3.99862 9.375 3.74998 9.375C3.50133 9.375 3.26288 9.27623 3.08706 9.10041C2.91125 8.9246 2.81248 8.68614 2.81248 8.4375ZM12.5 6.25H14.2969L12.5 4.45313V6.25Z" fill="#14132B" /></svg>
+                            <span>Download Excel</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button class="dropdown-item" @onclick="onChartClick">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="20" height="20" fill="none"><path d="M5 3V19H21V21H3V3H5ZM19.9393 5.93934L22.0607 8.06066L16 14.1213L13 11.121L9.06066 15.0607L6.93934 12.9393L13 6.87868L16 9.879L19.9393 5.93934Z" fill="#14132B"></path></svg>
+                            <span>Open Chart</span>
+                        </button>
+                    </li> *@
+                    
+                    @* <li>
+                    <button class="dropdown-item">
+                    <img src="/Images/icon-small-whatsapp.svg" />
+                    <span>Send on Whatsapp</span>
+                    </button>
+                    </li> *@
+
+                    @* <li>
+                    <button class="dropdown-item" @onclick="onClickPDFMail">
+                    <img src="/Images/icon-small-enve1.svg" />
+                    <span>Send by Email</span>
+                    </button>
+                    </li> *@
+              @*   </ul>
+            </div> *@
+            <a class="icon" href="#" data-bs-toggle="modal" data-bs-target="#exampleModalOne">
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18.875 20V12.5C18.875 12.2016 18.9935 11.9155 19.2045 11.7045C19.4155 11.4935 19.7016 11.375 20 11.375C20.2984 11.375 20.5845 11.4935 20.7955 11.7045C21.0065 11.9155 21.125 12.2016 21.125 12.5V20C21.125 20.2984 21.0065 20.5845 20.7955 20.7955C20.5845 21.0065 20.2984 21.125 20 21.125C19.7016 21.125 19.4155 21.0065 19.2045 20.7955C18.9935 20.5845 18.875 20.2984 18.875 20ZM25.1141 12.3125C24.8643 12.1587 24.5642 12.1085 24.278 12.1727C23.9917 12.2369 23.7419 12.4104 23.5817 12.6562C23.4215 12.902 23.3637 13.2006 23.4205 13.4884C23.4774 13.7762 23.6444 14.0304 23.8859 14.1969C25.9447 15.5347 27.125 17.6562 27.125 20C27.125 21.8897 26.3743 23.7019 25.0381 25.0381C23.7019 26.3743 21.8897 27.125 20 27.125C18.1103 27.125 16.2981 26.3743 14.9619 25.0381C13.6257 23.7019 12.875 21.8897 12.875 20C12.875 17.6562 14.0553 15.5347 16.1141 14.1922C16.3428 14.0208 16.4977 13.7687 16.5473 13.4872C16.5969 13.2057 16.5375 12.9159 16.3812 12.6766C16.2248 12.4373 15.9833 12.2665 15.7055 12.1989C15.4278 12.1313 15.1348 12.1719 14.8859 12.3125C12.1775 14.0731 10.625 16.8772 10.625 20C10.625 22.4864 11.6127 24.871 13.3709 26.6291C15.129 28.3873 17.5136 29.375 20 29.375C22.4864 29.375 24.871 28.3873 26.6291 26.6291C28.3873 24.871 29.375 22.4864 29.375 20C29.375 16.8772 27.8225 14.0731 25.1141 12.3125Z" fill="white" /></svg>
+            </a>
+           
+        </div>
+        
+    </header>
+    <!-- Content : start -->
+    <!-- Content : start -->
+    <section class="section content px-2">
+        <form class="d-flex flex-column report-view">
+            <SfSpinner @bind-Visible="@VisibleProperty" Label="Loading...." Type="@SpinnerType.Material">
+            </SfSpinner>
+            @{
+                var Tool = (new List<string>() { "Search" });
+            }
+            <SfGrid @ref="DefaultGrid" DataSource="@lstObj" ID="Grid" GridLines="GridLine.Both" AllowMultiSorting="true" 
+                    RowHeight="25" AllowResizing="true"  AllowGrouping="true" AllowSorting="true" 
+					ShowColumnMenu="true" AllowExcelExport="true" AllowPdfExport="true" 
+                    ShowColumnChooser="true" Toolbar=@Tool AllowReordering="true" >
+                @*EnablePersistence="true" *@
+                @*<GridPageSettings PageSizes="true"></GridPageSettings>*@
+                <GridEvents TValue="ExpandoObject" OnActionFailure="ActionFailureHandler" PdfGroupCaptionTemplateInfo="PdfGroupCaptionHandler"></GridEvents>
+                <GridTemplates>
+                    <EmptyRecordTemplate>
+                        <span>Please wait while data loading...</span>
+                    </EmptyRecordTemplate>
+                </GridTemplates>
+                <GridColumns>    
+                    @foreach (var stru in TblStru)
+                    {
+                        Pos = DSRptDevDet.HiddenCol.IndexOf(stru.FldName);
+                        if (Pos == -1 )
+                        {
+                            if (stru.DataType == "String")
+                            {
+                                <GridColumn Field=@stru.FldName HeaderText=@stru.FldName AllowEditing="true" Type="ColumnType.String" EditType="EditType.DefaultEdit"
+                                            TextAlign="Syncfusion.Blazor.Grids.TextAlign.Left" AutoFit="true" AllowResizing="true"/>
+                            }
+                            else if (stru.DataType == "Int32")
+                            {
+                                <GridColumn Field=@stru.FldName HeaderText=@stru.FldName AllowEditing="true" Type="ColumnType.Number" EditType="EditType.NumericEdit"
+                                            TextAlign="Syncfusion.Blazor.Grids.TextAlign.Right" AutoFit="true" AllowResizing="true" />
+                                @* Format = "n2" *@
+                            }
+                            else if (stru.DataType == "Double" || stru.DataType == "Decimal")
+                            {
+                                if (stru.FldName.ToString().Trim()=="PIPENO")
+                                {
+                                    <GridColumn Field=@stru.FldName HeaderText=@stru.FldName AllowEditing="true" EditType="EditType.NumericEdit"
+                                                TextAlign="Syncfusion.Blazor.Grids.TextAlign.Right" AutoFit="true" AllowResizing="true" />
+                                }
+                                else
+                                {
+
+                                    <GridColumn Field=@stru.FldName HeaderText=@stru.FldName AllowEditing="true" EditType="EditType.NumericEdit"
+                                                TextAlign="Syncfusion.Blazor.Grids.TextAlign.Right" Format="n2" AutoFit="true" AllowResizing="true" />
+                                }
+                                
+                            }
+                            else if (stru.DataType == "DateTime")
+                            {
+                                <GridColumn Field=@stru.FldName HeaderText=@stru.FldName AllowEditing="true" Type="ColumnType.DateOnly" EditType="EditType.DatePickerEdit"
+                                            TextAlign="Syncfusion.Blazor.Grids.TextAlign.Left" AutoFit="true" AllowResizing="true" Format="d" />
+                            }
+                            else if (stru.DataType == "Boolean")
+                            {
+                                <GridColumn Field=@stru.FldName HeaderText=@stru.FldName AllowEditing="true" Type="ColumnType.Boolean" DisplayAsCheckBox="true"
+                                EditType="EditType.BooleanEdit" AutoFit="true" />
+                            }
+                        }
+                    }
+                </GridColumns>
+                <GridAggregates>
+                    <GridAggregate>
+                        <GridAggregateColumns>
+                            @foreach (DataColumn col in dataTbl.Columns)
+                            {
+                                if (col.DataType.Name.Trim() == "Double" || col.DataType.Name.Trim() == "Decimal")
+                                {
+                                    <GridAggregateColumn Field=@col.ColumnName.ToString() Type="AggregateType.Sum" Format="n2">
+                                        <GroupFooterTemplate>
+                                            @{
+                                                var aggregate = (context as AggregateTemplateContext);
+                                                <div>
+                                                    @aggregate.Sum
+                                                </div>
+                                            }
+                                        </GroupFooterTemplate>
+                                        <FooterTemplate>
+                                            @{
+                                                var aggregate = (context as AggregateTemplateContext);
+                                                <div>
+                                                    @*<p>Sum: @aggregate.Sum</p>*@
+                                                    @aggregate.Sum
+                                                </div>
+                                            }
+                                        </FooterTemplate>
+                                    </GridAggregateColumn>
+                                }
+                            }
+                        </GridAggregateColumns>
+                    </GridAggregate>
+                </GridAggregates>
+
+            </SfGrid>
+
+        </form>
+    </section>
+  
+    <!-- Modal2 : start -->
+        <ExitModal></ExitModal>
+    <!-- Modal2 : end -->
+</div>
+<style>
+   /*  .e-grid .e-rowcell.e-attr {
+        white-space: normal;
+    } */
+    .e-dialog .e-dlg-header-content {
+        background-color: #00aeff
+    }
+
+    .e-dialog .e-dlg-header {
+        color: #fff
+    }
+
+    .e-dialog .e-dlg-header .e-btn-icon.e-icon-dlg-close {
+        color: #fff
+    }
+
+    /* img {
+        display: block;
+        margin: 0 auto
+    } */
+</style>
+
+@code {
+
+    [Parameter]
+    public int ReportId { get; set; }
+    [Parameter]
+    public int PartyId { get; set; }
+    [Parameter]
+    public string? Strcond { get; set; }
+    [Parameter]
+    public string ReportName { get; set; }
+
+    private bool VisibleProperty { get; set; } = false;
+    public List<ExpandoObject>? lstObj;
+    public DataTable? dataTbl = new DataTable();
+    public List<SQLTblFldDef> TblStru = new List<SQLTblFldDef>();
+    SfGrid<ExpandoObject> DefaultGrid;
+    public string[] MenuItems = new string[] { "Group", "Ungroup", "ColumnChooser", "Filter" };
+    private DSRptDevDet DSRptDevDet;
+    int Pos;
+    private List<ChartDataItem> ChartData;
+    public string[] GroupedColumns = new string[] { };
+    // public List<string> GroupedColumns = new List<string> { };
+
+    protected override async Task OnInitializedAsync()
+    {
+        VisibleProperty = true;
+        DSRptDevDet = myStateContainer.Value;
+        GroupedColumns = new string[] { };
+        if (Global.GrpColNm.Count > 0)
+        {
+            GroupedColumns = Global.GrpColNm.ToArray();
+            //GroupedColumns = new string[] { "Party" };
+        }
+        ShowReportData();
+        //await Task.Delay(2000);
+        VisibleProperty = false;
+    }
+    public void ShowColumnChooserBtn()
+    {
+        this.DefaultGrid.OpenColumnChooserAsync(100, 40);
+    }
+    public void HomeBtnClick()
+    {
+        //this.DefaultGrid.Refresh();
+        navigationManager.NavigateTo("/rptList");
+    }
+    public void GridPrint()
+    {
+        this.DefaultGrid.PrintAsync();
+    }
+    public void BackData()
+    {
+        Global.CompListNm = string.Empty;
+        //DSRptDevDet.CompIdList = string.Empty;
+        if(Global.RptCriteria)
+        {
+            navigationManager.NavigateTo("/rptcriteria");
+        }
+        else
+        {
+            navigationManager.NavigateTo("/rptList");
+        }
+    }
+    public void PdfGroupCaptionHandler(PdfCaptionTemplateArgs args)
+    {
+        // Here, you can customize the groupcaption cell value in pdf export.
+        args.Cell.Value = args.Key;
+    }
+    private async void onChartClick()
+    {
+        if (ChartData.Count > 0)
+        {
+            await sfDialogService.AlertAsync(null, "Report Chart", new DialogOptions()
+            {
+                ChildContent =
+                @<div class="graph w-100">
+                    <div class="graph-wrap">
+                        <SfChart Height="300px" Width="300px" Title="@DSRptDevDet.RptName">
+                            <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category" LabelIntersectAction="LabelIntersectAction.MultipleRows"></ChartPrimaryXAxis>
+                            <ChartZoomSettings EnableMouseWheelZooming="true" EnablePinchZooming="true"></ChartZoomSettings>
+                            <ChartTooltipSettings Enable="true"></ChartTooltipSettings>
+                            <ChartSeriesCollection>
+                                <ChartSeries DataSource="@ChartData" XName="XValue" YName="YValue" Type="ChartSeriesType.Spline">
+                                    <ChartMarker Visible="true" Height="5" Width="5" />
+                                </ChartSeries>
+                            </ChartSeriesCollection>
+                        </SfChart>
+                    </div>
+                </div>
+                ,
+                ShowCloseIcon = true,
+                AllowDragging = true,
+                CloseOnEscape = true,
+                PrimaryButtonOptions = new DialogButtonOptions() { Content = "Okay" }
+            });
+        }
+        else
+        {
+            await sfDialogService.AlertAsync("Chart data not found.", Global.SfDialogMsg);
+        }
+    }
+    //public async Task onExcelClick()
+    private async void onExcelClick()
+    {
+        try
+        {
+            ExcelExportProperties ExcelProperties = new ExcelExportProperties();
+            //ExcelProperties.DataSource = lstObj;
+            ExcelProperties.FileName = DSRptDevDet.RptName.ToString().Trim() + ".xlsx";
+
+            await this.DefaultGrid.ExportToExcelAsync();
+            await sfDialogService.AlertAsync("Excel Export successfully");
+        }
+        catch( Exception ex)
+        {
+            await sfDialogService.AlertAsync(ex.Message + ex.InnerException);
+        }
+
+    }
+    private async void onPDFClickold(MouseEventArgs args)
+    {
+        try
+        {
+            int paragraphAfterSpacing = 8;
+            // PdfExportProperties ExportProperties = new PdfExportProperties();
+            // ExportProperties.FileName = DSRptDevDet.RptName.ToString().Trim() + ".pdf";
+            // await this.DefaultGrid.PdfExport(ExportProperties);
+            string FileName = DSRptDevDet.RptName.ToString().Trim() + ".pdf";
+            PdfDocument pdfDocument = new PdfDocument();
+            // Setting Page Orientation
+            pdfDocument.PageSettings.Orientation = PdfPageOrientation.Landscape;
+            //Add page to the PDF document.
+            PdfPage pdfPage = pdfDocument.Pages.Add();
+
+            /*
+            //Create a header and draw the image.
+            RectangleF bounds = new RectangleF(0, 0, pdfDocument.Pages[0].GetClientSize().Width, 50);
+            PdfPageTemplateElement header = new PdfPageTemplateElement(bounds);
+            //Load the PDF document
+            FileStream imageStream = new FileStream("logo1.png", FileMode.Open, FileAccess.Read);
+            PdfImage image = new PdfBitmap(imageStream);
+            //Draw the image in the header.
+            header.Graphics.DrawImage(image, new PointF(0, 0), new SizeF(50, 50));
+            //Add the header at the top.
+            pdfDocument.Template.Top = header;*/
+
+            //Create a new PdfGrid.
+            PdfGrid pdfGrid = new PdfGrid();
+
+            //Create a new font.
+            PdfStandardFont font = new PdfStandardFont(PdfFontFamily.TimesRoman, 12);//16
+
+            //Create a text element to draw a text in PDF page.
+            //PdfTextElement title = new PdfTextElement(DSRptDevDet.RptName.ToString().Trim(), font, PdfBrushes.Black);
+            PdfTextElement title = new PdfTextElement("Jupiter Systems", font, PdfBrushes.Black);
+            PdfLayoutResult result = title.Draw(pdfPage, new PointF(0, 0));
+            PdfStandardFont contentFont = new PdfStandardFont(PdfFontFamily.TimesRoman, 12);
+            PdfTextElement content = new PdfTextElement(DSRptDevDet.RptName.ToString().Trim(), contentFont, PdfBrushes.Black);
+            //Set properties to paginate the grid
+            PdfGridLayoutFormat layoutFormat = new PdfGridLayoutFormat();
+            layoutFormat.Break = PdfLayoutBreakType.FitPage;
+            layoutFormat.Layout = PdfLayoutType.OnePage;
+            //Draw a text to the PDF document.
+            result = content.Draw(pdfPage, new RectangleF(0, result.Bounds.Bottom + paragraphAfterSpacing, pdfPage.GetClientSize().Width, pdfPage.GetClientSize().Height), layoutFormat);
+
+
+            pdfGrid.Columns.Add(DefaultGrid.Columns.Count);
+
+            PdfGridRow[] headerRow = pdfGrid.Headers.Add(1);
+            var GridColHeader = DefaultGrid.Columns.Select(x => x.HeaderText).ToList();
+            for (var i = 0; i < DefaultGrid.Columns.Count; i++)
+            {
+                headerRow[0].Cells[i].Value = GridColHeader[i];
+                headerRow[0].Cells[i].Style.BackgroundBrush = PdfBrushes.Gray;
+            }
+            /*
+            PdfGridCellStyle cellStyle = new PdfGridCellStyle();
+            //Create a new instance for string format.
+            PdfStringFormat cformat = new PdfStringFormat();
+            //Set a word wrap to string format.
+            cformat.WordWrap = PdfWordWrapType.Word;
+
+            cellStyle.StringFormat = cformat;
+            */
+            foreach (dynamic RowValCnt in lstObj)
+            {
+                PdfGridRow row = pdfGrid.Rows.Add();
+                int rowCntr = 0;
+                bool first = true;
+                foreach (KeyValuePair<string, object> kp in RowValCnt)
+                {
+                    if (first)
+                    {
+                        rowCntr = 0;
+                        first = false;
+                    }
+                    else
+                    {
+                        ++rowCntr;
+                    }
+                    //if (rowCntr != 0){ ++rowCntr; }
+                    row.Cells[rowCntr].Value = kp.Value.ToString();
+                    //row.Cells[rowCntr].Style = cellStyle;
+                }
+            }
+            //Declare and define the grid style.
+            PdfGridStyle gridStyle = new PdfGridStyle();
+            //Set cell padding, which specifies the space between the border and content of the cell.
+            //gridStyle.CellPadding = new PdfPaddings(2, 2, 2, 2);
+            //Set cell spacing, which specifies the space between the adjacent cells.
+            //gridStyle.CellSpacing = 2;
+            //Enable to adjust PDF table row width based on the text length.
+            gridStyle.AllowHorizontalOverflow = true;
+            //Apply style.
+            pdfGrid.Style = gridStyle;
+            //Apply built-in table style
+            pdfGrid.ApplyBuiltinStyle(PdfGridBuiltinStyle.GridTable4Accent1);
+
+            //enable repeating grid column header in each page
+            pdfGrid.RepeatHeader = true;
+            //Draw the PdfGrid.
+            //pdfGrid.Draw(pdfPage, new PointF(15, 15));
+            pdfGrid.Draw(pdfPage, new PointF(0, result.Bounds.Bottom + paragraphAfterSpacing));
+            MemoryStream stream = new MemoryStream();
+
+            pdfDocument.Save(stream);
+            //Close the document
+            pdfDocument.Close(true);
+            try
+            {
+                //stream.Position = 0;
+                //Saves the memory stream as file.
+                //SaveService saveService = new();
+                //saveService.SaveAndView("testkp.pdf", "application/pdf", stream);
+                await JsRuntime.InvokeVoidAsync("exportSave", new object[] { "export1.pdf", Convert.ToBase64String(stream.ToArray()) });
+                //await JsRuntime.InvokeVoidAsync("saveAsFile", new object[] { FileName, Convert.ToBase64String(stream.ToArray()) });
+                //FileStream fileStream = new FileStream(FileName, System.IO.FileMode.Open, System.IO.FileAccess.Read);
+                // Syncfusion.Pdf.Parsing.PdfLoadedDocument document = new Syncfusion.Pdf.Parsing.PdfLoadedDocument(fileStream);
+                await sfDialogService.AlertAsync("PDF Export successfully");            }
+            catch(Exception ex)
+            {
+                await sfDialogService.AlertAsync("PDF Export Error : "+ex.Message + ex.InnerException);
+            }
+
+        }
+        catch (Exception ex)
+        {
+            await sfDialogService.AlertAsync(ex.Message + ex.InnerException);
+        }
+    }
+    // private async void onClickPDFMail(MouseEventArgs args)
+    // {
+
+    // string senderAddress = "kp@jupitersystems.in";
+    // string receiverAddress = "amish@jupitersystems.in";
+    // string subject = "Test email with attachment";
+    // string body = "This is a test email with attachment.";
+    // string attachmentFilePath = @"D:\SALES.pdf";
+
+    // AmazonSimpleEmailServiceClient client = new AmazonSimpleEmailServiceClient(
+    //     "AKIA4VEGFX5SRP7XATKU",
+    //     "fJRfuY3YHZRQ1FF5W8HyaFrPcrEYOqgoePj8CnbF",
+    //     RegionEndpoint.APSouth1);
+
+    // var bodyBuilder = new BodyBuilder();
+
+    // bodyBuilder.HtmlBody = body;
+    // bodyBuilder.TextBody = body;
+    // using (FileStream fileStream = new FileStream(attachmentFilePath, FileMode.Open, FileAccess.Read))
+    // {
+    //     bodyBuilder.Attachments.Add(attachmentFilePath, fileStream);
+    // }
+    // var mimeMessage = new MimeMessage();
+    // mimeMessage.From.Add(new MailboxAddress("From Name", senderAddress));
+    // mimeMessage.To.Add(new MailboxAddress("Recipient Name", receiverAddress));
+    // mimeMessage.Subject = subject;
+    // mimeMessage.Body = bodyBuilder.ToMessageBody();
+
+    // using (var messageStream = new MemoryStream())
+    // {
+    //     await mimeMessage.WriteToAsync(messageStream);
+    //     var sendRequest = new SendRawEmailRequest { RawMessage = new RawMessage(messageStream) };
+    //     var response = await client.SendRawEmailAsync(sendRequest);
+    // }
+    // Console.WriteLine("Email Successfully Sent");
+    // sfDialogService.AlertAsync("Mail PDF File successfully");
+    // }
+    // private void OnButtonClick()
+    // {
+
+    //     //JsRuntime.InvokeVoidAsync($"window.Close");
+    // }
+
+    private async void ShowReportData()
+    {
+        try
+        {
+            DSRptDevDet DSRptDevDet1 = new DSRptDevDet
+		    {
+			    ReportId = DSRptDevDet.ReportId,
+			    PartyId = DSRptDevDet.PartyId,
+			    QueryCond = DSRptDevDet.QueryCond.Trim(),
+			    //CompIdList = DSRptDevDet.CompIdList.Trim(),
+                CompIdList=Global.CompListNm,
+			    MainDB = DSRptDevDet.MainDB.Trim(),
+			    YearId = DSRptDevDet.YearId.Trim(),
+                MainConnStr = Global.MainDBConnStr
+                
+		    };
+
+            string json = JsonConvert.SerializeObject(DSRptDevDet1);
+            var response = await RazorFunc.CallAPIAsync(Global.APIURL, "GetReportData", json);
+            var respStatusCode = response.StatusCode;
+            if (respStatusCode.ToString() == "OK")
+            {
+                var responseBody = await response.Content.ReadAsStringAsync();
+                var retJSON = JsonConvert.DeserializeObject<RetJSON>(responseBody);
+
+                if (retJSON.Status.ToString() == "Error")
+                {
+                    await sfDialogService.AlertAsync(retJSON.Msg.ToString() + retJSON.ExError, Global.SfDialogMsg);
+                }
+                else
+                {
+                    TblStru = JsonConvert.DeserializeObject<List<SQLTblFldDef>>(retJSON.AdtData.ToString().Trim());
+                    dataTbl = JsonConvert.DeserializeObject<DataTable>(retJSON.Data.ToString().Trim());
+                    lstObj = new List<System.Dynamic.ExpandoObject>();
+                    ChartData = new List<ChartDataItem>();
+                    string XFldName, YFldName = "";
+                    if (dataTbl.Rows.Count > 0)
+                    {
+                        foreach (DataRow row in dataTbl.Rows)
+                        {
+                            if (!string.IsNullOrEmpty(DSRptDevDet.XAxis) && !string.IsNullOrEmpty(DSRptDevDet.YAxis1))
+                            {
+                                XFldName = DSRptDevDet.XAxis.ToString().Trim();
+                                XFldName = XFldName.Substring(0, XFldName.IndexOf("~"));
+
+                                YFldName = DSRptDevDet.YAxis1.ToString().Trim();
+                                YFldName = YFldName.Substring(0, YFldName.IndexOf("~"));
+                                ChartData.Add(new ChartDataItem
+                                {
+                                    XValue = row[XFldName].ToString().Trim(),
+                                    YValue = double.Parse(row[YFldName].ToString().Trim()),
+                                    RptName = DSRptDevDet.RptName.ToString()
+                                });
+                            }
+                            /*if (DSRptDevDet.RptName.Trim() == "GREY STOCK SUMMARY")
+                                {
+                                ChartData.Add(new ChartDataItem
+                                    {
+                                    XValue = row["ItemName"].ToString().Trim(),
+                                    YValue = double.Parse(row["BalMtr"].ToString().Trim()),
+                                    RptName = DSRptDevDet.RptName.ToString()
+                            });
+                            }
+                            */
+                            System.Dynamic.ExpandoObject e = new System.Dynamic.ExpandoObject();
+                            foreach (DataColumn col in dataTbl.Columns)
+                            {
+                                e.TryAdd(col.ColumnName, row.ItemArray[col.Ordinal]);
+                            }
+                            lstObj.Add(e);
+                        }
+                    }
+                    else
+                    {
+                        await sfDialogService.AlertAsync("No records found for selected criteria.", Global.SfDialogMsg);
+                        BackData();
+                    }
+                }
+            }
+            if (GroupedColumns.Length > 0)
+            {
+                DefaultGrid.GroupSettings.Columns = GroupedColumns;
+            }
+            await DefaultGrid.Refresh();
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await sfDialogService.AlertAsync("ShowDashBordData => " + ex.Message, CoreVars.EXERROR);
+        }
+    }
+    public void ActionFailureHandler(Syncfusion.Blazor.Grids.FailureEventArgs args)
+    {
+        sfDialogService.AlertAsync("ActionFailureHandler => " + args.Error.Message, CoreVars.ERROR);
+    }
+    private async void onPDFClick(MouseEventArgs args)
+    {
+        //Merging two memory stream
+        MemoryStream mergedStream = new MemoryStream();
+
+        //PdfCompressionOptions options = new PdfCompressionOptions();
+        //options.OptimizePageContents = true;
+        //Creates a PDF document.
+        Syncfusion.Pdf.PdfDocument finalDoc = new Syncfusion.Pdf.PdfDocument();
+        // //Create a copy of streamDoc1 to access the memory stream
+        // MemoryStream copyOfStreamDoc1 = new MemoryStream(streamDoc1.ToArray());
+
+        //Customized grid for memory stream export
+        PdfExportProperties ExportProperties = new PdfExportProperties();
+        ExportProperties.FileName = DSRptDevDet.RptName.Trim() + ".pdf";
+
+        ExportProperties.DisableAutoFitWidth = true;
+        ExportProperties.AllowHorizontalOverflow = true;
+        ExportProperties.IncludeTemplateColumn = true;
+        
+        ExportProperties.PageSize = Syncfusion.Blazor.Grids.PdfPageSize.A4;
+        PdfTheme Theme = new PdfTheme();
+        PdfBorder HeaderBorder = new PdfBorder();
+        HeaderBorder.Color = "#000000";
+        ExportProperties.PageOrientation = PageOrientation.Landscape;
+        
+        //List<PdfHeaderFooterContent> HeaderContent = new List<PdfHeaderFooterContent>
+        //{
+        //    new PdfHeaderFooterContent() { Type = ContentType.Text, Value = "LAXMI SYNTEX PVT LTD" , Position = new PdfPosition() { X = 0, Y = 25 }, Style = new PdfContentStyle() { TextBrushColor = "#000000", FontSize = 12 } },
+        //    new PdfHeaderFooterContent() { Type = ContentType.Text, Value = DSRptDevDet.RptName.Trim() , Position = new PdfPosition() { X = 15, Y = 25 }, Style = new PdfContentStyle() { TextBrushColor = "#000000", FontSize = 12 } }
+        //    //new PdfHeaderFooterContent() { Type = ContentType.Text, Value = "Report Period : From  01-01-2024 to 05-01-2024", Position = new PdfPosition() { X = 0, Y = 25 }, Style = new PdfContentStyle() { TextBrushColor = "#000000", FontSize = 12 } }
+        //};
+
+        //PdfHeader Header = new PdfHeader()
+        //{
+        //    FromTop = 0,
+        //    Height = 130,
+        //    Contents = HeaderContent
+        //};
+        //ExportProperties.Header = Header;
+        PdfThemeStyle CaptionThemeStyle = new PdfThemeStyle()
+            {
+                FontColor = "000000",
+                FontSize = 12,
+                Bold = true
+            };
+        Theme.Caption = CaptionThemeStyle;
+        ExportProperties.IsRepeatHeader = true;
+        PdfThemeStyle HeaderThemeStyle = new PdfThemeStyle()
+            {
+                FontColor = "000000",
+                FontSize = 10,
+                Bold = true,
+                Border = HeaderBorder,
+            };
+        Theme.Header = HeaderThemeStyle;
+        //FontColor = "#800080",
+        //FontName = "Comic Sans MS",
+
+        PdfThemeStyle RecordThemeStyle = new PdfThemeStyle()
+            {
+                FontColor = "000000",
+                FontSize = 10,
+                Border = HeaderBorder,
+                FontName = "Times New Roman"
+            };
+        Theme.Record = RecordThemeStyle;
+
+        ExportProperties.Theme = Theme;
+
+        List<PdfHeaderFooterContent> FooterContent = new List<PdfHeaderFooterContent>
+        {
+            new PdfHeaderFooterContent() { Type = ContentType.PageNumber, PageNumberType= PdfPageNumberType.Arabic, Position = new PdfPosition() { X = 0, Y = 50 }, Style = new PdfContentStyle() { TextBrushColor = "#000000", FontSize = 12, HAlign=PdfHorizontalAlign.Center } }
+        };
+        PdfFooter footer = new PdfFooter()
+            {
+                FromBottom = 0,
+                Height = 130,
+                Contents = FooterContent
+            };
+        ExportProperties.Footer = footer;
+        //MemoryStream stream = new MemoryStream();
+        //MemoryStream streamDoc = await DefaultGrid.ExportToPdfAsync(asMemoryStream: true, ExportProperties);
+        MemoryStream stream = await DefaultGrid.ExportToPdfAsync(asMemoryStream: true, ExportProperties);
+        //Create a copy of streamDoc1
+        MemoryStream copyOfStreamDoc1 = new MemoryStream(stream.ToArray());
+        finalDoc.Save(mergedStream);
+        finalDoc.Close(true);
+        try
+        {
+            mergedStream.Position = 0;
+            // Saves the memory stream as file.
+            SaveService saveService = new();
+            saveService.SaveAndView(ExportProperties.FileName, "application/pdf", copyOfStreamDoc1);
+            finalDoc.Close(true);
+        }
+        catch (Exception ex)
+        {
+            await sfDialogService.AlertAsync("PDF Export Error : " + ex.Message + ex.InnerException);
+        }
+
+    }
+}

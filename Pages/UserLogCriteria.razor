@@ -1,0 +1,244 @@
+@page "/useractlogcrit"
+
+@inject SfDialogService sfDialogService
+@inject NavigationManager navigationManager
+@inject MyStateContainer myStateContainer
+
+@using Newtonsoft.Json
+@using Syncfusion.Blazor.Popups
+@using System.Data
+@using Syncfusion.Blazor.Calendars
+@using Syncfusion.Blazor.DropDowns
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.Buttons
+@using System.Dynamic
+@using Syncfusion.Blazor.Spinner
+@using Syncfusion.Blazor.Grids
+@using JSCoreLibRazor
+@using Syncfusion.Blazor.Layouts
+@using Microsoft.AspNetCore.Components.Rendering;
+@using Microsoft.AspNetCore.Components;
+@using System.Collections.Generic;
+@using Syncfusion.Blazor.Navigations
+
+<div id="page" class="page">
+    <header class="header">
+        <div class="header-icons">
+            <a class="icon" onclick="@BackData">
+                <img src="/Images/icon-header-back.svg">
+            </a>
+        </div>
+        <div class="header-title">
+            <h1>User Activity Criteria</h1>
+        </div>
+        <div class="header-icons">
+            <a class="icon" @onclick="BackData">
+                <img src="/Images/icon-header-home.svg">
+            </a>
+            <a class="icon" href="#" data-bs-toggle="modal" data-bs-target="#exampleModalOne">
+                <img src="/Images/icon-header-exit.svg">
+            </a>
+        </div>
+    </header>
+    <!-- Content : start -->
+    <section class="section content px-2">
+        <form class="register-form d-flex flex-column">
+            <div class="mb-3">
+                <SfCheckBox Label="Detail" @bind-Checked="isDetailChecked"></SfCheckBox>
+            </div>
+            @if (isDetailChecked)
+            {
+                <div class="mb-3">
+                    <label class="form-label">Date</label>
+                    <div class="form-field-2col">
+                        <SfDateTimePicker TValue="DateTime?" Format="dd/MM/yyyy" @bind-Value="@FromDate">
+                            <DateTimePickerEvents TValue="DateTime?" ValueChange="DtValueChangeHandler"></DateTimePickerEvents>
+                        </SfDateTimePicker>
+                        <SfDateTimePicker TValue="DateTime?" Format="dd/MM/yyyy" @bind-Value="@ToDate">
+                            <DateTimePickerEvents TValue="DateTime?" ValueChange="DtToValueChangeHandler"></DateTimePickerEvents>
+                        </SfDateTimePicker>
+                    </div>
+                </div>
+                @DynamicRender
+            }
+
+            @* <div class="mb-3">
+                <label class="form-label"> User Role</label>
+                <SfDropDownList TValue="string" TItem="string" @bind-Value="UserRoleVal"
+                                Placeholder="Select a User Role" DataSource="@UserRoleData" AllowFiltering="true"
+                                FilterBarPlaceholder="Search User Role" class="form-select select-dropdown">
+                </SfDropDownList>
+            </div> *@
+            
+        </form>
+    </section>
+    <!-- Content : end -->
+    <!-- Footer : start -->
+    <footer class="footer">
+        <div class="d-flex align-content-center justify-content-between flex-nowrap p-2 gap-2">
+            <button type="submit" class="btn btn-primary w-50" @onclick="GetRptData">Generate</button>
+            <button class="btn btn-light w-50" @onclick="BackData">Cancel</button>
+        </div>
+    </footer>
+    <!-- Footer : end -->
+    <!-- Modal2 : start -->
+    <ExitModal></ExitModal>
+    @* <div class="modal fade" id="exampleModalOne" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-body text-center py-4">
+                    <h5>Are you sure?</h5>
+                    <p>Logout and Exit from the app.</p>
+                </div>
+                <div class="modal-footer d-flex align-content-center justify-content-between flex-nowrap">
+                    <button type="button" class="btn btn-light w-50" data-bs-dismiss="modal">No</button>
+                    <button type="button" class="btn btn-primary w-50" onclick="@Global.ExitApp">Exit</button>
+                </div>
+            </div>
+        </div>
+    </div> *@
+    <!-- Modal2 : end -->
+</div>
+
+@code {
+
+    private DSRptDevDet DSRptDevDet;
+    public DateTime? FromDate { get; set; } = DateTime.Now;
+    public DateTime? ToDate { get; set; } = DateTime.Now;
+   //List<string> UserRoleData = new List<string>() { "SYSADMIN", "ADMIN", "PARTY", "AGENT", "INCHARGE", "SALESMAN" };
+    public string UserRoleVal = string.Empty;
+    public string StrCond = string.Empty;
+    DropDownListObject DropDownListObject = new DropDownListObject();
+    public List<DropDownListObject> UserDataSource { get; set; } = new List<DropDownListObject>();
+    private string[] UserllistVal = new string[] { };
+    GetTableData oTblData;
+    public DataTable? DataTbl = new DataTable();
+    public List<SQLTblFldDef> TblStru = new List<SQLTblFldDef>();
+    public RenderFragment DynamicRender { get; set; }
+    private bool isDetailChecked = false;
+
+    protected override void OnInitialized()
+    {
+        DSRptDevDet = myStateContainer.Value;
+        FillUSerNameDataSource();
+        DynamicRender = CreateComponent(this);
+    }
+    private void BackData()
+    {
+        navigationManager.NavigateTo("/dashpgnew");
+    }
+    public void DtValueChangeHandler(ChangedEventArgs<DateTime?> args)
+    {
+        FromDate = args.Value;
+    }
+    public void DtToValueChangeHandler(ChangedEventArgs<DateTime?> args)
+    {
+        ToDate = args.Value;
+    }
+    private void GetRptData()
+    {
+        StrCond = "";
+        // if (UserRoleVal != null && UserRoleVal.Length != 0)
+        // {
+        //     StrCond += " and UserRole = '" + UserRoleVal + "' ";
+        // }
+        if (UserllistVal != null && UserllistVal.Length != 0)
+        {
+            StrCond += " and UserName in ( '" + string.Join("','", UserllistVal) + "') ";
+        }
+        if (isDetailChecked)
+        {
+            if (FromDate.HasValue && ToDate.HasValue)
+            {
+                //Strcond += " and a.InvDate between '" + string.Format("{0:MM/dd/yyyy}", FromDate) + "' and '" + string.Format("{0:MM/dd/yyyy}", ToDate) + "'";
+                StrCond += " and Date between '" + string.Format("{0:yyyy/MM/dd}", FromDate) + "' and '" + string.Format("{0:yyyy/MM/dd}", ToDate) + "'";
+            }
+        }
+        Global.lDetUserActLog = isDetailChecked;
+        DSRptDevDet.QueryCond = StrCond;
+        navigationManager.NavigateTo("/useractivity");
+
+    }
+    private async void FillUSerNameDataSource()
+    {
+        oTblData = new GetTableData
+        {
+            SelectClause = " isnull(CPerson,'') as UserName",
+            TableName = " DeviceRegister ",
+            WhereCond = " where AppType = '" + Global.AppType + "'",
+            OrdBy = " Order by CPerson",
+            SQLConnStr = Global.MainDBConnStr
+        };
+        string json = JsonConvert.SerializeObject(oTblData);
+        var response = await RazorFunc.CallAPIAsync(Global.APIURL, "GetTableData", json);
+        var respStatusCode = response.StatusCode;
+        if (respStatusCode.ToString() == "OK")
+        {
+            var responseBody = await response.Content.ReadAsStringAsync();
+            var retJSON = JsonConvert.DeserializeObject<RetJSON>(responseBody);
+            if (retJSON.Status.ToString() == "Error")
+            {
+                await sfDialogService.AlertAsync(retJSON.Msg.ToString() + retJSON.ExError, Global.SfDialogMsg);
+            }
+            else
+            {
+                DataTbl = JsonConvert.DeserializeObject<DataTable>(retJSON.Data.ToString().Trim());
+                System.Data.DataRow lstrow;
+                for (int ictr = 0; ictr < DataTbl.Rows.Count; ictr++)
+                {
+                    lstrow = DataTbl.Rows[ictr];
+                    DropDownListObject listObject = new DropDownListObject();
+                    listObject.ID = lstrow["UserName"].ToString().Trim();
+                    listObject.Text = lstrow["UserName"].ToString().Trim();
+                    UserDataSource.Add(listObject);
+                }
+            }
+        }
+        else
+        {
+            await sfDialogService.AlertAsync(response.ReasonPhrase, Global.SfDialogMsg);
+        }
+        StateHasChanged();
+    }
+
+    public RenderFragment CreateComponent(IComponent owner) => builder =>
+    {
+        int ictr = 0;
+        builder.OpenElement(ictr, "div");
+        builder.AddAttribute(ictr++, "class", "mb-3");
+
+        builder.OpenElement(ictr++, "label");
+        builder.AddAttribute(ictr++, "class", "form-label");
+        builder.AddContent(ictr++, "UserName");
+        builder.CloseElement();
+
+        builder.OpenComponent(ictr++, typeof(SfMultiSelect<string[], DropDownListObject>));
+        builder.AddAttribute(ictr++, "DataSource", UserDataSource);
+        builder.AddAttribute(ictr++, "Mode", VisualMode.CheckBox);
+        builder.AddAttribute(ictr++, "ShowDropDownIcon", true);
+        builder.AddAttribute(ictr++, "ShowSelectAll", true);
+        builder.AddAttribute(ictr++, "AllowFiltering", true);
+        builder.AddAttribute(ictr++, "class", "form-select");
+        builder.AddAttribute(ictr++, "Placeholder", "Select a UserName");
+        builder.AddAttribute(ictr++, "FilterBarPlaceholder", "Search UserName");
+
+        builder.AddAttribute(ictr++, "ChildContent", (Microsoft.AspNetCore.Components.RenderFragment)((builder2) =>
+        {
+            builder2.OpenComponent<Syncfusion.Blazor.DropDowns.MultiSelectEvents<string[], DropDownListObject>>(6);
+            builder2.AddAttribute(ictr++, "ValueChange", EventCallback.Factory.Create<MultiSelectChangeEventArgs<string[]>>(this, args =>
+            {
+                UserllistVal = args.Value;
+            }));
+            builder2.CloseComponent();
+
+            builder2.AddMarkupContent(ictr++, "\r    ");
+            builder2.OpenComponent<MultiSelectFieldSettings>(6);
+            builder2.AddAttribute(ictr++, "Value", "ID");
+            builder2.AddAttribute(ictr++, "Text", "Text");
+            builder2.CloseComponent();
+            builder2.AddMarkupContent(ictr++, "\r");
+        }));
+        builder.CloseComponent();
+        builder.CloseElement();
+    };
+}

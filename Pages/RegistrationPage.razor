@@ -1,0 +1,295 @@
+@page "/regUser"
+
+@inject IJSRuntime JSRuntime
+@inject SfDialogService sfDialogService
+@inject ILocalStorageService _localstorage
+@inject NavigationManager navigationManager
+
+@using Microsoft.Extensions.DependencyInjection;
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.DropDowns
+@using Syncfusion.Blazor.Buttons
+@using Newtonsoft.Json
+@using Syncfusion.Blazor.Popups;
+@using System.ComponentModel.DataAnnotations;
+@using JSCoreLibRazor
+@using System.Data;
+@using System.Dynamic
+
+<div id="page" class="page">
+
+    <header class="header">
+        <div class="site-brand">
+            <img src="/Images/logo.png">
+        </div>
+
+        <div class="header-title">
+            <h1>DreamSmart</h1>
+        </div>
+
+        <div class="header-icons">
+            <a class="icon" href="#" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                @* <img src="/Images/icon-header-support.svg"> *@
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M27.1934 12.8609C25.7792 11.4377 23.9743 10.4664 22.0074 10.0701C20.0405 9.67392 18.0003 9.8706 16.1453 10.6353C14.2903 11.3999 12.7042 12.6981 11.5879 14.3653C10.4716 16.0325 9.87543 17.9936 9.875 20V25.25C9.875 25.9462 10.1516 26.6139 10.6438 27.1062C11.1361 27.5984 11.8038 27.875 12.5 27.875H14C14.6962 27.875 15.3639 27.5984 15.8562 27.1062C16.3484 26.6139 16.625 25.9462 16.625 25.25V21.5C16.625 20.8038 16.3484 20.1361 15.8562 19.6438C15.3639 19.1516 14.6962 18.875 14 18.875H12.2038C12.4753 17.0008 13.4126 15.2871 14.8443 14.0475C16.276 12.808 18.1063 12.1255 20 12.125H20.06C21.9453 12.1331 23.7647 12.8197 25.1853 14.0592C26.6059 15.2986 27.5327 17.0082 27.7963 18.875H26C25.3038 18.875 24.6361 19.1516 24.1438 19.6438C23.6516 20.1361 23.375 20.8038 23.375 21.5V25.25C23.375 25.9462 23.6516 26.6139 24.1438 27.1062C24.6361 27.5984 25.3038 27.875 26 27.875H27.8375C27.7511 28.2985 27.5209 28.6791 27.1861 28.9525C26.8512 29.2258 26.4322 29.3751 26 29.375H20.75C20.4516 29.375 20.1655 29.4935 19.9545 29.7045C19.7435 29.9155 19.625 30.2016 19.625 30.5C19.625 30.7984 19.7435 31.0845 19.9545 31.2955C20.1655 31.5065 20.4516 31.625 20.75 31.625H26C27.0936 31.6238 28.1421 31.1888 28.9154 30.4154C29.6888 29.6421 30.1238 28.5936 30.125 27.5V20C30.1302 18.6757 29.8739 17.3633 29.3708 16.1383C28.8677 14.9132 28.1278 13.7995 27.1934 12.8609ZM14 21.125C14.0995 21.125 14.1948 21.1645 14.2652 21.2348C14.3355 21.3052 14.375 21.4005 14.375 21.5V25.25C14.375 25.3495 14.3355 25.4448 14.2652 25.5152C14.1948 25.5855 14.0995 25.625 14 25.625H12.5C12.4005 25.625 12.3052 25.5855 12.2348 25.5152C12.1645 25.4448 12.125 25.3495 12.125 25.25V21.125H14ZM25.625 25.25V21.5C25.625 21.4005 25.6645 21.3052 25.7348 21.2348C25.8052 21.1645 25.9005 21.125 26 21.125H27.875V25.625H26C25.9005 25.625 25.8052 25.5855 25.7348 25.5152C25.6645 25.4448 25.625 25.3495 25.625 25.25Z" fill="white" /></svg>
+            </a>
+        </div>
+    </header>
+
+    <section class="section content px-2">
+        <h2 class="page-title">Register</h2>
+
+        <EditForm Model="@regDet" class="register-form d-flex flex-column">
+            <div class="mb-3">
+                <DataAnnotationsValidator />
+                <label class="form-label">Company name</label>
+                <SfTextBox @bind-Value="regDet.CompName" FloatLabelType="@FloatLabelType.Always" class="form-control"></SfTextBox>
+                @*<ValidationMessage For="@(() => regDet.CompName)" />*@
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Contact person</label>
+                 <SfTextBox @bind-Value="regDet.CPerson" FloatLabelType="@FloatLabelType.Always" class="form-control"></SfTextBox>
+                 <ValidationMessage For="@(() => regDet.CPerson)" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Mobile no.</label>
+                <SfTextBox @bind-Value="regDet.MobileNo" FloatLabelType="@FloatLabelType.Always" maxlength="10" inputmode="numeric" class="form-control"></SfTextBox>
+                <ValidationMessage For="@(() => regDet.MobileNo)"></ValidationMessage>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Email address</label>
+                <SfTextBox @bind-Value="regDet.Email" FloatLabelType="@FloatLabelType.Always" class="form-control"></SfTextBox>
+               
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Select business</label>
+                <SfComboBox class="form-select" TItem="Business"  TValue="string" FloatLabelType="@FloatLabelType.Always" @bind-Value="regDet.BusinessVal" DataSource="@BusinessList">
+                    <ComboBoxFieldSettings Text="Name" Value="Name"></ComboBoxFieldSettings>
+                </SfComboBox>
+                <ValidationMessage For="@(() => regDet.BusinessVal)"></ValidationMessage>
+            </div>
+
+            <button type="submit" class="btn btn-primary" @onclick="regRequest">Register</button>
+        </EditForm>
+     </section>
+    <!-- Footer : start -->
+    @*<footer class="footer">
+        <div class="d-flex align-content-center flex-column p-3 pb-4">
+            <p class="text-center">Already have an account?</p>
+            <a href="login.html" class="btn btn-link">Login</a>
+        </div>
+    </footer>*@
+    <!-- Footer : end -->
+    <!-- Modal : start -->
+        <HelpDesk></HelpDesk>
+    <!-- Modal : end -->
+    </div>
+  
+@code {
+
+    public static DevRegDet regDet;
+    GetTableData oTblData;
+    public DataTable? DataTbl = new DataTable();
+    public string TextMsg = "";
+
+    protected override Task OnInitializedAsync()
+    {
+        regDet = new DevRegDet();
+        return base.OnInitializedAsync();
+    }
+    public class Business
+    {
+        public string Id { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+    }
+
+    List<Business> BusinessList = new List<Business>
+    {
+          new Business() { Id= "1", Name= "YARN MFG" },
+          new Business() { Id= "2", Name= "ADS" },
+          new Business() { Id= "2", Name= "AKASH" },
+          new Business() { Id= "3", Name= "TRANSPORT" },
+          new Business() { Id= "4", Name= "YARN TRADING" },
+          new Business() { Id= "5", Name= "GREY TRADING" },
+          new Business() { Id= "6", Name= "GREY MFG" },
+          new Business() { Id= "7", Name= "PROCESS HOUSE" },
+          new Business() { Id= "8", Name= "LOG BOOK"},
+          new Business() { Id= "9", Name= "SHINE" },
+          new Business() { Id= "10", Name= "JSCLP" }
+    };
+
+    private async void regRequest()
+    {
+        try
+        {
+            if (!string.IsNullOrEmpty(regDet.MobileNo) && regDet.MobileNo.Trim().Length == 10 && regDet.CompName.Trim().Length > 2 && regDet.CPerson.Trim().Length > 2)
+            {
+                oTblData = new GetTableData
+                {
+                    SelectClause = " IMEINO",
+                    TableName = " DeviceRegister ",
+                    WhereCond = " where AppType = '" + Global.AppType + "' and IMEINO = '" + regDet.MobileNo + "'",
+                    SQLConnStr = Global.MainDBConnStr
+                };
+
+                string json = JsonConvert.SerializeObject(oTblData);
+                var response = await RazorFunc.CallAPIAsync(Global.APIURL, "GetTableData", json);
+                var respStatusCode = response.StatusCode;
+                if (respStatusCode.ToString() == "OK")
+                {
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    var retJSON = JsonConvert.DeserializeObject<RetJSON>(responseBody);
+                    if (retJSON.Status.ToString() == "Error")
+                    {
+                        await sfDialogService.AlertAsync(retJSON.Msg.ToString() + retJSON.ExError, Global.SfDialogMsg);
+                    }
+                    else
+                    {
+                        DataTbl = JsonConvert.DeserializeObject<DataTable>(retJSON.Data.ToString().Trim());
+                        if (DataTbl.Rows.Count > 0)
+                        {
+
+                            /*string Msg = "This mobileno is now registered. Please use 9999 as login pin for login.";
+                            await sfDialogService.AlertAsync(Msg, Global.SfDialogMsg);
+                            await _localstorage.RemoveItemAsync(Global.AppType.ToString().Trim());
+                            await _localstorage.SetItemAsync(Global.AppType.ToString().Trim(), regDet.MobileNo);
+                            await Task.Delay(1000);
+
+                            TextMsg = "Application login done with mobile no. " + regDet.MobileNo + "." + Environment.NewLine + " %0a" + CoreVars.APPMANAGER;
+                            string URL = "https://enotify.app/api/sendText?token=" + "64f72d93758e0a1ddfba152c" +
+                                         "&phone=91" + Global.DSAdminMob + "&message=" + TextMsg;
+
+                            var serviceProvider = new ServiceCollection().AddHttpClient().BuildServiceProvider();
+                            var httpClientFactory = serviceProvider.GetService<IHttpClientFactory>();
+                            var httpClient = httpClientFactory.CreateClient();
+                            response = await httpClient.GetAsync(URL);
+                            await Task.Delay(1000);
+
+                            navigationManager.NavigateTo("/");*/
+
+                            if (regDet.MobileNo.Trim() == "8780178336" || regDet.MobileNo.Trim() == "9998970699")
+                            {
+                                await _localstorage.RemoveItemAsync(Global.AppType.ToString().Trim());
+                                await _localstorage.SetItemAsync(Global.AppType.ToString().Trim(), regDet.MobileNo);
+                                await Task.Delay(1000);
+                                navigationManager.NavigateTo("/");
+                            }
+                            else
+                            {
+                                string Msg = "This mobileno is already registered. Please contact system admin to unregister it, then retry." + '\n' + "Application will exit for now.";
+                                await sfDialogService.AlertAsync(Msg, Global.SfDialogMsg);
+                                Environment.Exit(0);
+                            }
+                        }
+                        else
+                        {
+                            List<AllRowValue> allRowValues = new List<AllRowValue>();
+                            List<RowValue> RowData = new List<RowValue>();
+
+                            RowData.Add(new RowValue { FldName = "Party", FldValue = regDet.CompName.ToString() });
+                            RowData.Add(new RowValue { FldName = "CPerson", FldValue = regDet.CPerson.ToString() });
+                            RowData.Add(new RowValue { FldName = "MobileNo", FldValue = regDet.MobileNo });
+                            RowData.Add(new RowValue { FldName = "Email", FldValue = (string.IsNullOrEmpty(regDet.Email.ToString()) ? "" : regDet.Email.ToString()) });
+                            RowData.Add(new RowValue { FldName = "Business", FldValue = regDet.BusinessVal.ToString() });
+                            RowData.Add(new RowValue { FldName = "IMEINO", FldValue = regDet.MobileNo });
+                            RowData.Add(new RowValue { FldName = "AppType", FldValue = Global.AppType });
+                            //RowData.Add(new ColumnValue { FldName = "Brand", FldValue = regDet.Manufacturer.ToString() });
+                            //RowData.Add(new ColumnValue { FldName = "Platform", FldValue = regDet.Platform.ToString() });
+                            //RowData.Add(new ColumnValue { FldName = "Model", FldValue = regDet.Model.ToString() });
+
+                            AllRowValue allRowValue = new AllRowValue
+                            {
+                                AllRowValues = RowData
+                            };
+                            allRowValues.Add(allRowValue);
+
+                            SaveDataObj saveDataObj = new SaveDataObj
+                            {
+                                MstTblRowData = allRowValues,
+                                MstTable = "DeviceRegister",
+                                DelSaveWhrCondFldNm = "",
+                                DelSaveWhrCondFldVal="",
+                                SQLConnStr = Global.MainDBConnStr
+                            };
+                            json = JsonConvert.SerializeObject(saveDataObj);
+                            response = await RazorFunc.CallAPIAsync(Global.APIURL, "RecDevRegnDet", json);
+                            respStatusCode = response.StatusCode;
+                            if (respStatusCode.ToString() == "OK")
+                            {
+                                responseBody = await response.Content.ReadAsStringAsync();
+                                retJSON = JsonConvert.DeserializeObject<RetJSON>(responseBody);
+
+                                if (retJSON.Status.ToString() == "Error")
+                                {
+                                    await sfDialogService.AlertAsync(retJSON.Msg.ToString(), "OK");
+                                }
+                                else
+                                {
+                                    string Msg = "Device Registration detail sent successfully." + Environment.NewLine + "Application will exit for now.";
+                                    await sfDialogService.AlertAsync(Msg, Global.SfDialogMsg);
+                                    await _localstorage.RemoveItemAsync(Global.AppType.ToString().Trim());
+                                    await _localstorage.SetItemAsync(Global.AppType.ToString().Trim(), regDet.MobileNo);
+                                    await Task.Delay(1000);
+
+                                    TextMsg = "A new device registration request is received from " + regDet.CPerson.ToString().Trim() +
+                                              " with mobile no. " + regDet.MobileNo + " for " + regDet.CompName.ToString().Trim() + "." + Environment.NewLine + " %0a" + CoreVars.APPMANAGER;
+                                    string URL = "https://enotify.app/api/sendText?token=" + "64f72d93758e0a1ddfba152c" +
+                                                 "&phone=91" + Global.DSAdminMob + "&message=" + TextMsg;
+
+                                    var serviceProvider = new ServiceCollection().AddHttpClient().BuildServiceProvider();
+                                    var httpClientFactory = serviceProvider.GetService<IHttpClientFactory>();
+                                    var httpClient = httpClientFactory.CreateClient();
+
+                                    response = await httpClient.GetAsync(URL);
+                                    await Task.Delay(1000);
+
+                                    // URL = "https://enotify.app/api/sendText?token=" + "64f72d93758e0a1ddfba152c" +
+                                    //                 "&phone=91" + Global.AdminMob + "&message=" + TextMsg;
+
+                                    // serviceProvider = new ServiceCollection().AddHttpClient().BuildServiceProvider();
+                                    // httpClientFactory = serviceProvider.GetService<IHttpClientFactory>();
+                                    // httpClient = httpClientFactory.CreateClient();
+
+                                    // response = await httpClient.GetAsync(URL);
+                                    // await Task.Delay(1000);
+
+                                    Environment.Exit(0);
+                                }
+                            }
+                        }
+                    }
+                }
+
+            }
+            else
+            {
+                await sfDialogService.AlertAsync("Please enter valid data.", Global.SfDialogMsg);
+            }
+        }
+        catch (Exception ex)
+        {
+            await sfDialogService.AlertAsync("ShowDashBordData => " + ex.Message, CoreVars.EXERROR);
+        }
+    }
+    // protected string GenerateOTP()
+    // {
+    //     string characters = "1234567890";
+    //     string otp = string.Empty;
+    //     for (int i = 0; i < 6; i++)
+    //     {
+    //         string character = string.Empty;
+    //         do
+    //         {
+    //             int index = new Random().Next(0, characters.Length);
+    //             character = characters.ToCharArray()[index].ToString();
+    //         } while (otp.IndexOf(character) != -1);
+    //         otp += character;
+    //     }
+    //     return otp;
+    // }
+    // public string InputOTPValue { get; set; }
+    // //string activationCode = this.GenerateOTP();
+   
+}

@@ -1,0 +1,798 @@
+@page "/rptcriteria"
+
+@inject SfDialogService sfDialogService
+@inject NavigationManager navigationManager
+@inject MyStateContainer myStateContainer
+
+@using Newtonsoft.Json
+@using Syncfusion.Blazor.Popups
+@using System.Data;
+@using Syncfusion.Blazor.Calendars
+@using Syncfusion.Blazor.DropDowns
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.Buttons
+@using System.Dynamic
+@using Syncfusion.Blazor.Spinner
+@using JSCoreLibRazor
+
+<div id="page" class="page">
+    <header class="header">
+        <div class="header-icons">
+            <a class="icon" onclick="@ReportListClick">
+                @* <img src="/Images/icon-header-back.svg"> *@
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M29.375 20C29.375 20.2984 29.2565 20.5845 29.0455 20.7955C28.8345 21.0065 28.5484 21.125 28.25 21.125H14.4688L19.2988 25.9541C19.5101 26.1654 19.6289 26.4521 19.6289 26.7509C19.6289 27.0498 19.5101 27.3365 19.2988 27.5478C19.0874 27.7592 18.8008 27.8779 18.5019 27.8779C18.203 27.8779 17.9164 27.7592 17.705 27.5478L10.955 20.7978C10.8502 20.6933 10.7669 20.5691 10.7102 20.4324C10.6534 20.2956 10.6241 20.149 10.6241 20.0009C10.6241 19.8529 10.6534 19.7063 10.7102 19.5695C10.7669 19.4328 10.8502 19.3086 10.955 19.2041L17.705 12.4541C17.8097 12.3494 17.9339 12.2664 18.0706 12.2098C18.2074 12.1531 18.3539 12.124 18.5019 12.124C18.6499 12.124 18.7964 12.1531 18.9332 12.2098C19.0699 12.2664 19.1941 12.3494 19.2988 12.4541C19.4034 12.5587 19.4864 12.6829 19.5431 12.8197C19.5997 12.9564 19.6289 13.1029 19.6289 13.2509C19.6289 13.3989 19.5997 13.5455 19.5431 13.6822C19.4864 13.8189 19.4034 13.9432 19.2988 14.0478L14.4688 18.875H28.25C28.5484 18.875 28.8345 18.9935 29.0455 19.2045C29.2565 19.4155 29.375 19.7016 29.375 20Z" fill="white"/></svg>
+            </a>
+        </div>
+
+        <div class="header-title">
+            <h1>@DSRptDevDet.RptName</h1>
+        </div>
+
+        <div class="header-icons">
+            <a class="icon" onclick="@ClickHomePage">
+                @* <img src="/Images/icon-header-home.svg"> *@
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M28.7712 17.4547L21.2759 10.3794L21.2609 10.3653C20.9165 10.0501 20.4665 9.87525 19.9995 9.87525C19.5326 9.87525 19.0826 10.0501 18.7381 10.3653L18.7222 10.3794L11.2287 17.4547C11.0387 17.6305 10.887 17.8436 10.7831 18.0808C10.6792 18.3179 10.6254 18.5739 10.625 18.8328V27.5C10.625 27.9973 10.8225 28.4742 11.1742 28.8258C11.5258 29.1775 12.0027 29.375 12.5 29.375H17C17.4973 29.375 17.9742 29.1775 18.3258 28.8258C18.6775 28.4742 18.875 27.9973 18.875 27.5V23.375H21.125V27.5C21.125 27.9973 21.3225 28.4742 21.6742 28.8258C22.0258 29.1775 22.5027 29.375 23 29.375H27.5C27.9973 29.375 28.4742 29.1775 28.8258 28.8258C29.1775 28.4742 29.375 27.9973 29.375 27.5V18.8328C29.3746 18.5739 29.3208 18.3179 29.2169 18.0808C29.113 17.8436 28.9613 17.6305 28.7712 17.4547ZM27.125 27.125H23.375V23C23.375 22.7538 23.3265 22.51 23.2323 22.2825C23.138 22.055 22.9999 21.8483 22.8258 21.6742C22.6517 21.5001 22.445 21.362 22.2175 21.2677C21.99 21.1735 21.7462 21.125 21.5 21.125H18.5C18.0027 21.125 17.5258 21.3225 17.1742 21.6742C16.8225 22.0258 16.625 22.5027 16.625 23V27.125H12.875V18.995L20 12.2684L27.125 18.995V27.125Z" fill="white" /></svg>
+            </a>
+            <a class="icon" href="#" data-bs-toggle="modal" data-bs-target="#exampleModalOne">
+                @* <img src="/Images/icon-header-exit.svg"> *@
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18.875 20V12.5C18.875 12.2016 18.9935 11.9155 19.2045 11.7045C19.4155 11.4935 19.7016 11.375 20 11.375C20.2984 11.375 20.5845 11.4935 20.7955 11.7045C21.0065 11.9155 21.125 12.2016 21.125 12.5V20C21.125 20.2984 21.0065 20.5845 20.7955 20.7955C20.5845 21.0065 20.2984 21.125 20 21.125C19.7016 21.125 19.4155 21.0065 19.2045 20.7955C18.9935 20.5845 18.875 20.2984 18.875 20ZM25.1141 12.3125C24.8643 12.1587 24.5642 12.1085 24.278 12.1727C23.9917 12.2369 23.7419 12.4104 23.5817 12.6562C23.4215 12.902 23.3637 13.2006 23.4205 13.4884C23.4774 13.7762 23.6444 14.0304 23.8859 14.1969C25.9447 15.5347 27.125 17.6562 27.125 20C27.125 21.8897 26.3743 23.7019 25.0381 25.0381C23.7019 26.3743 21.8897 27.125 20 27.125C18.1103 27.125 16.2981 26.3743 14.9619 25.0381C13.6257 23.7019 12.875 21.8897 12.875 20C12.875 17.6562 14.0553 15.5347 16.1141 14.1922C16.3428 14.0208 16.4977 13.7687 16.5473 13.4872C16.5969 13.2057 16.5375 12.9159 16.3812 12.6766C16.2248 12.4373 15.9833 12.2665 15.7055 12.1989C15.4278 12.1313 15.1348 12.1719 14.8859 12.3125C12.1775 14.0731 10.625 16.8772 10.625 20C10.625 22.4864 11.6127 24.871 13.3709 26.6291C15.129 28.3873 17.5136 29.375 20 29.375C22.4864 29.375 24.871 28.3873 26.6291 26.6291C28.3873 24.871 29.375 22.4864 29.375 20C29.375 16.8772 27.8225 14.0731 25.1141 12.3125Z" fill="white" /></svg>
+            </a>
+        </div>
+    </header>
+    <!-- Content : start -->
+    <section class="section content px-2">
+        <form class="register-form d-flex flex-column">
+            @DynamicRender
+        </form>
+    </section>
+    <!-- Content : end -->
+    <!-- Footer : start -->
+    <footer class="footer">
+        <div class="d-flex align-content-center justify-content-between flex-nowrap p-3 gap-2">
+            <button type="submit" class="btn btn-primary w-50" @onclick="GetData">Generate</button>
+            <button class="btn btn-light w-50" @onclick="ReportListClick">Cancel</button>
+        </div>
+    </footer>
+    <!-- Footer : end -->
+    <!-- Modal2 : start -->
+        <ExitModal></ExitModal>
+    <!-- Modal2 : end -->
+</div>
+
+@code {
+
+    [Parameter]
+    public int ReportId { get; set; }
+    [Parameter]
+    public string RptType { get; set; } = string.Empty;
+    [Parameter]
+    public int PartyId { get; set; }
+    [Parameter]
+    public string ReportName { get; set; } = string.Empty;
+
+    private RenderFragment DynamicRender { get; set; }
+    public DateTime InvDate { get; set; } = DateTime.Now.Date;
+    public DateTime ToInvDate { get; set; } = DateTime.Now.Date;
+    public string value { get; set; } = "AAYAN TRADERS";
+    public string Invchr { get; set; } = "abc";
+    public DataTable Dt ;
+    DropDownListObject DropDownListObject = new DropDownListObject();
+    public List<DropDownListObject> DataSource2 { get; set; } = new List<DropDownListObject>();
+    public List<DropDownListObject> CompList { get; set; } = new List<DropDownListObject>();
+    private string[] Ptylist = new string[] { "AAYAN TRADERS", "AJAY FABRICS."  };
+    private bool shouldRender = true;
+    List<ObjDet> oObjComp = new List<ObjDet>();
+    public int? FromNo { get; set; } = 0;
+    public int? ToNo { get; set; } = 0;
+    public string Strcond = "";
+    private DSRptDevDet DSRptDevDet;
+    private bool isChecked = true;
+    public string TempVal { get; set; } = "";
+    List<string> Buttons { get; set; } = new List<string>() { "You forgot to declare your buttons" ,"abc","mnp"};
+    List<string> HiddenColNm = new List<string>();
+    GetTableData oTblData;
+    private string[] CompIdlist = new string[] { };
+
+    protected override void OnInitialized()
+    {
+        int ReptId = ReportId;
+        DSRptDevDet = myStateContainer.Value;
+        ShowReportCriteria();
+        
+    }
+    private void ReportListClick()
+    {
+        shouldRender = false;
+        navigationManager.NavigateTo("/rptList");
+    }
+    public void ClickHomePage()
+    {
+        shouldRender = false;
+        navigationManager.NavigateTo("/dashpgnew");
+    }
+    private void onChange(Syncfusion.Blazor.Calendars.ChangedEventArgs<DateTime> args)
+    {
+        shouldRender = false;
+        InvDate = args.Value.Date;
+    }
+
+    public RenderFragment CreateComponent(IComponent owner) => builder =>
+    {
+        int ictr = 0;
+        Global.GrpColNm = new List<string>();
+        foreach (System.Data.DataRow row in Dt.Rows)
+        {
+
+            if (row["Criteria"].ToString().Trim() == "HIDDEN")
+            {
+                HiddenColNm.Add(row["ColName"].ToString());
+                DSRptDevDet.HiddenCol.Add(row["ColName"].ToString());
+            }
+            if (row["Criteria"].ToString().Trim() == "GROUP BY")
+            {
+                Global.GrpColNm.Add(row["ColName"].ToString());
+            }
+            
+            /*if (row["Criteria"].ToString().Trim() == "SUM")
+                {
+                Global.SumColNm.Add(row["ColName"].ToString());
+            }
+            if (row["Criteria"].ToString().Trim() == "COUNT")
+                {
+                Global.CntColNm.Add(row["ColName"].ToString());
+                }*/
+            
+
+            if (row["Criteria"].ToString().Trim() == "CRI/RANGE INPUT")
+            {
+                if (row["Datatype"].ToString().Trim() == "D")
+                {
+                    oObjComp.Add(new ObjDet()
+                    {
+                        SqlFldName = row["AcSQLFldName"].ToString(),
+                        ColName = row["ColName"].ToString(),
+                        DataType = row["Datatype"].ToString(),
+                        Alias = row["Alias"].ToString(),
+                        CriType = row["Criteria"].ToString().Trim()
+                    });
+
+                    builder.OpenElement(ictr, "div");
+                    builder.AddAttribute(ictr++, "class", "mb-3");
+
+                    builder.OpenElement(ictr++, "label");
+                    builder.AddAttribute(ictr++, "class", "form-label");
+                    builder.AddContent(ictr++, "Date");//row["ColName"].ToString() + " From "
+                    builder.CloseElement();
+
+                    builder.OpenElement(ictr++, "div");
+                    builder.AddAttribute(ictr++, "class", "form-field-2col");
+
+                    builder.OpenComponent(ictr++, typeof(SfDateTimePicker<DateTime>));
+                    builder.AddAttribute(ictr++, "Date", "Enter Date");
+                    builder.AddAttribute(ictr++, "Value", DateTime.Now.Date);
+                    builder.AddAttribute(ictr++, "Format", "dd/MM/yyyy");
+
+                    builder.AddAttribute(ictr++, "ChildContent", (Microsoft.AspNetCore.Components.RenderFragment)((builder2) =>
+                    {
+                        builder2.AddMarkupContent(ictr++, "\r    ");
+                        builder2.OpenComponent<Syncfusion.Blazor.Calendars.DateTimePickerEvents<DateTime>>(6);
+                        builder2.AddAttribute(ictr++, "ValueChange", EventCallback.Factory.Create<ChangedEventArgs<DateTime>>(this, args =>
+                        {
+                            InvDate = args.Value.Date;
+                            int Index = oObjComp.FindIndex(comp => comp.ColName == row["ColName"].ToString());
+                            if (Index >= 0)
+                            {
+                                oObjComp[Index].DateVal = args.Value;
+                            }
+                            shouldRender = false;
+                        }));
+                        builder2.CloseComponent();
+                        builder2.AddMarkupContent(ictr++, "\r");
+                    }));
+                    builder.CloseComponent();
+
+                    oObjComp.Add(new ObjDet()
+                    {
+                        SqlFldName = row["AcSQLFldName"].ToString(),
+                        ColName = row["ColName"].ToString() + "2",
+                        DataType = row["Datatype"].ToString(),
+                        Alias = row["Alias"].ToString(),
+                        CriType = row["Criteria"].ToString()
+                    });
+
+                    builder.OpenComponent(ictr++, typeof(SfDateTimePicker<DateTime>));
+                    builder.AddAttribute(ictr++, "Date", "Enetr Date");
+                    builder.AddAttribute(ictr++, "Value", DateTime.Now);
+                    builder.AddAttribute(ictr++, "Format", "dd/MM/yyyy");
+
+                    builder.AddAttribute(ictr++, "ChildContent", (Microsoft.AspNetCore.Components.RenderFragment)((builder2) =>
+                    {
+                        builder2.AddMarkupContent(ictr++, "\r    ");
+                        builder2.OpenComponent<Syncfusion.Blazor.Calendars.DateTimePickerEvents<DateTime>>(6);
+                        builder2.AddAttribute(ictr++, "ValueChange", EventCallback.Factory.Create<ChangedEventArgs<DateTime>>(this, args =>
+                        {
+                            ToInvDate = args.Value.Date;
+                            int Index = oObjComp.FindIndex(comp => comp.ColName == row["ColName"].ToString() + "2");
+                            if (Index >= 0)
+                            {
+                                oObjComp[Index].DateVal = args.Value;
+                            }
+                            shouldRender = false;
+                        }));
+                        builder2.CloseComponent();
+                        builder2.AddMarkupContent(ictr++, "\r");
+                    }));
+                    builder.CloseComponent();
+
+                    builder.CloseElement();
+                    builder.CloseElement();
+                }
+                else if (row["Datatype"].ToString().Trim() == "N")
+                {
+                    oObjComp.Add(new ObjDet()
+                    {
+                        SqlFldName = row["AcSQLFldName"].ToString(),
+                        ColName = row["ColName"].ToString(),
+                        DataType = row["Datatype"].ToString(),
+                        Alias = row["Alias"].ToString(),
+                        CriType = row["Criteria"].ToString()
+                    });
+                    builder.OpenElement(ictr, "div");
+                    builder.AddAttribute(ictr++, "class", "mb-3");
+
+                    builder.OpenElement(ictr++, "label");
+                    builder.AddAttribute(ictr++, "class", "form-label");
+                    builder.AddContent(ictr++, row["ColName"].ToString() + " From ");
+                    builder.CloseElement();
+
+                    builder.OpenElement(ictr++, "div");
+                    builder.AddAttribute(ictr++, "class", "form-field-2col");
+
+                    builder.OpenComponent(ictr++, typeof(SfNumericTextBox<int>));
+                    builder.AddAttribute(ictr++, "Placeholder", "Enetr FromNo");
+                    builder.AddAttribute(ictr++, "Value", FromNo);
+
+                    builder.AddAttribute(ictr++, "ChildContent", (Microsoft.AspNetCore.Components.RenderFragment)((builder2) =>
+                    {
+                        builder2.AddMarkupContent(ictr++, "\r    ");
+                        builder2.OpenComponent<Syncfusion.Blazor.Inputs.NumericTextBoxEvents<int>>(6);
+                        builder2.AddAttribute(ictr++, "ValueChange", EventCallback.Factory.Create<ChangedEventArgs<int>>(this, args =>
+                        {
+                            FromNo = args.Value;
+                            int Index = oObjComp.FindIndex(comp => comp.ColName == row["ColName"].ToString());
+                            if (Index >= 0)
+                            {
+                                oObjComp[Index].NumVal = (int)args.Value;
+                            }
+                            shouldRender = false;
+
+                        }));
+                        builder2.CloseComponent();
+                        builder2.AddMarkupContent(ictr++, "\r");
+                    }));
+                    builder.CloseComponent();
+
+                    oObjComp.Add(new ObjDet()
+                    {
+                        SqlFldName = row["AcSQLFldName"].ToString(),
+                        ColName = row["ColName"].ToString() + "2",
+                        DataType = row["Datatype"].ToString(),
+                        Alias = row["Alias"].ToString(),
+                        CriType = row["Criteria"].ToString()
+                    });
+
+                    builder.OpenComponent(ictr++, typeof(SfNumericTextBox<int>));
+                    builder.AddAttribute(ictr++, "Placeholder", "Enetr FromNo");
+                    builder.AddAttribute(ictr++, "Value", ToNo);
+
+                    builder.AddAttribute(ictr++, "ChildContent", (Microsoft.AspNetCore.Components.RenderFragment)((builder2) =>
+                    {
+                        builder2.AddMarkupContent(ictr++, "\r    ");
+                        builder2.OpenComponent<Syncfusion.Blazor.Inputs.NumericTextBoxEvents<int>>(6);
+                        builder2.AddAttribute(ictr++, "ValueChange", EventCallback.Factory.Create<ChangedEventArgs<int>>(this, args =>
+                        {
+                            ToNo = args.Value;
+                            int Index = oObjComp.FindIndex(comp => comp.ColName == row["ColName"].ToString() + "2");
+                            if (Index >= 0)
+                            {
+                                oObjComp[Index].NumVal = args.Value;
+                            }
+                            shouldRender = false;
+                        }));
+                        builder2.CloseComponent();
+                        builder2.AddMarkupContent(ictr++, "\r");
+                    }));
+                    builder.CloseComponent();
+
+                    builder.CloseElement();
+                    builder.CloseElement();
+                }
+            }
+            else if (row["Criteria"].ToString().Trim() == "CRI/SELECTION INPUT")
+            {
+                @if (row["ColName"].ToString().Trim() == "COMPID")
+                {
+                    if (DSRptDevDet.MultiFirm.ToString().Trim() == "Y")
+                    {
+                        builder.OpenElement(ictr, "div");
+                        builder.AddAttribute(ictr++, "class", "mb-3");
+
+                        builder.OpenElement(ictr++, "label");
+                        builder.AddAttribute(ictr++, "class", "form-label");
+                        builder.AddContent(ictr++, row["ColName"].ToString().Trim());
+                        builder.CloseElement();
+
+                        builder.OpenComponent(ictr++, typeof(SfMultiSelect<string[], DropDownListObject>));
+                        builder.AddAttribute(ictr++, "DataSource", CompList);
+                        builder.AddAttribute(ictr++, "Mode", VisualMode.CheckBox);
+                        builder.AddAttribute(ictr++, "ShowDropDownIcon", true);
+                        builder.AddAttribute(ictr++, "ShowSelectAll", true);
+                        builder.AddAttribute(ictr++, "AllowFiltering", true);
+                        builder.AddAttribute(ictr++, "class", "form-select");
+                        builder.AddAttribute(ictr++, "FilterBarPlaceholder", "Search Company");
+
+                        builder.AddAttribute(ictr++, "ChildContent", (Microsoft.AspNetCore.Components.RenderFragment)((builder2) =>
+                        {
+                            builder2.OpenComponent<Syncfusion.Blazor.DropDowns.MultiSelectEvents<string[], DropDownListObject>>(6);
+                            builder2.AddAttribute(ictr++, "ValueChange", EventCallback.Factory.Create<MultiSelectChangeEventArgs<string[]>>(this, args =>
+                            {
+                                var text = args.Value;
+                                CompIdlist = args.Value;
+                                shouldRender = false;
+                            }));
+                            builder2.CloseComponent();
+
+                            builder2.AddMarkupContent(ictr++, "\r    ");
+                            builder2.OpenComponent<MultiSelectFieldSettings>(6);
+                            builder2.AddAttribute(ictr++, "Value", "ID");
+                            builder2.AddAttribute(ictr++, "Text", "Text");
+                            builder2.CloseComponent();
+                            builder2.AddMarkupContent(ictr++, "\r");
+                        }));
+                        builder.CloseComponent();
+                        builder.CloseElement();
+                    }
+                }
+                else
+                {
+                    oObjComp.Add(new ObjDet()
+                    {
+                        SqlFldName = row["AcSQLFldName"].ToString(),
+                        ColName = row["ColName"].ToString(),
+                        DataType = row["Datatype"].ToString(),
+                        Alias = row["Alias"].ToString(),
+                        CriType = row["Criteria"].ToString()
+                    });
+
+                    builder.OpenElement(ictr, "div");
+                    builder.AddAttribute(ictr++, "class", "mb-3");
+
+                    builder.OpenElement(ictr++, "label");
+                    builder.AddAttribute(ictr++, "class", "form-label");
+                    builder.AddContent(ictr++, row["ColName"].ToString());
+                    builder.CloseElement();
+
+                    builder.OpenComponent(ictr++, typeof(SfMultiSelect<string[], DropDownListObject>));
+                    //builder.AddAttribute(ictr++, "value", Ptylist);
+                    builder.AddAttribute(ictr++, "DataSource", DataSource2);
+                    builder.AddAttribute(ictr++, "Mode", VisualMode.CheckBox);
+                    builder.AddAttribute(ictr++, "ShowDropDownIcon", true);
+                    builder.AddAttribute(ictr++, "ShowSelectAll", true);
+                    builder.AddAttribute(ictr++, "AllowFiltering", true);
+                    builder.AddAttribute(ictr++, "class", "form-select");
+                    builder.AddAttribute(ictr++, "FilterBarPlaceholder", "Search " + row["ColName"].ToString());
+
+                    builder.AddAttribute(ictr++, "ChildContent", (Microsoft.AspNetCore.Components.RenderFragment)((builder2) =>
+                    {
+                        builder2.OpenComponent<Syncfusion.Blazor.DropDowns.MultiSelectEvents<string[], DropDownListObject>>(6);
+                        builder2.AddAttribute(ictr++, "ValueChange", EventCallback.Factory.Create<MultiSelectChangeEventArgs<string[]>>(this, args =>
+                        {
+                            var text = args.Value;
+                            int Index = oObjComp.FindIndex(comp => comp.ColName == row["ColName"].ToString());
+                            if (Index >= 0)
+                            {
+                                oObjComp[Index].ComboVal = args.Value;
+                            }
+                            shouldRender = false;
+                        }));
+                        builder2.CloseComponent();
+
+                        builder2.AddMarkupContent(ictr++, "\r    ");
+                        builder2.OpenComponent<MultiSelectFieldSettings>(6);
+                        builder2.AddAttribute(ictr++, "Value", "ID");
+                        builder2.AddAttribute(ictr++, "Text", "Text");
+                        builder2.CloseComponent();
+                        builder2.AddMarkupContent(ictr++, "\r");
+                    }));
+                    builder.CloseComponent();
+                    builder.CloseElement();
+                }
+                
+            }
+            else if (row["Criteria"].ToString().Trim() == "CRI/SIMPLE INPUT")
+            {
+                oObjComp.Add(new ObjDet()
+                {
+                    SqlFldName = row["AcSQLFldName"].ToString(),
+                    ColName = row["ColName"].ToString(),
+                    DataType = row["Datatype"].ToString(),
+                    Alias = row["Alias"].ToString(),
+                    CriType = row["Criteria"].ToString()
+                });
+                builder.OpenElement(ictr, "div");
+                builder.AddAttribute(ictr++, "class", "mb-3");
+                if (row["Datatype"].ToString().Trim() == "C")
+                {
+                    builder.OpenElement(ictr++, "label");
+                    builder.AddAttribute(ictr++, "class", "form-label");
+                    builder.AddContent(ictr++, row["ColName"].ToString());
+                    builder.CloseElement();
+
+                    builder.OpenComponent(ictr++, typeof(SfTextBox));
+                    builder.AddAttribute(ictr++, "PlaceHolder", "Enter " + row["ColName"].ToString());
+                    //builder.AddAttribute(ictr++, "Value", Invchr);
+                    builder.AddAttribute(ictr++, "ValueChange", EventCallback.Factory.Create<Syncfusion.Blazor.Inputs.ChangedEventArgs>(this, args =>
+                    {
+                        Invchr = args.Value.ToString();
+                        int Index = oObjComp.FindIndex(comp => comp.ColName == row["ColName"].ToString());
+                        if (Index >= 0)
+                        {
+                            oObjComp[Index].StrVal = args.Value.ToString();
+                        }
+                        shouldRender = false;
+                    }));
+                    builder.CloseComponent();
+                }
+                else if (row["Datatype"].ToString().Trim() == "D")
+                {
+                    builder.OpenElement(ictr, "label");
+                    builder.AddAttribute(ictr++, "class", "form-label");
+                    builder.AddContent(ictr++, "Date");//row["ColName"].ToString() + " From "
+                    builder.CloseElement();
+
+                    builder.OpenComponent(ictr++, typeof(SfDateTimePicker<DateTime>));
+                    builder.AddAttribute(ictr++, "Date", "Enetr Date");
+                    builder.AddAttribute(ictr++, "Value", InvDate);
+                    builder.AddAttribute(ictr++, "Format", "dd/MM/yyyy");
+
+                    builder.AddAttribute(ictr++, "ChildContent", (Microsoft.AspNetCore.Components.RenderFragment)((builder2) =>
+                    {
+                        builder2.AddMarkupContent(ictr++, "\r    ");
+                        builder2.OpenComponent<Syncfusion.Blazor.Calendars.DateTimePickerEvents<DateTime>>(6);
+                        builder2.AddAttribute(ictr++, "ValueChange", EventCallback.Factory.Create<ChangedEventArgs<DateTime>>(this, args =>
+                        {
+                            InvDate = args.Value.Date;
+                            int Index = oObjComp.FindIndex(comp => comp.ColName == row["ColName"].ToString());
+                            if (Index >= 0)
+                            {
+                                oObjComp[Index].DateVal = args.Value;
+                            }
+                            shouldRender = false;
+
+                        }));
+                        builder2.CloseComponent();
+                        builder2.AddMarkupContent(ictr++, "\r");
+                    }));
+                    builder.CloseComponent();
+                }
+                builder.CloseElement();
+            }
+        }
+
+    };
+    private void GetData()
+    {
+        shouldRender = false;
+        Strcond = " ";
+        @if (DSRptDevDet.MultiFirm.ToString().Trim() == "Y")
+        {
+            Global.CompListNm = String.Join(",",CompIdlist);
+            //DSRptDevDet.CompIdList = String.Join(",", CompIdlist);
+            //Global.CompListNm.AddRange(CompIdlist);
+            //Global.CompListNm.Add("");
+        }
+        for (int iCtr = 0; iCtr < oObjComp.Count; iCtr++)
+        {
+            if (!string.IsNullOrEmpty(oObjComp[iCtr].CriType))
+            {
+                if (oObjComp[iCtr].CriType.Trim() == "CRI/SIMPLE INPUT")
+                {
+                    if (oObjComp[iCtr].DataType.Trim() == "D")
+                    {
+                        if (oObjComp[iCtr].DateVal != null)
+                        {
+                            Strcond += " and " + oObjComp[iCtr].Alias.Trim() + oObjComp[iCtr].SqlFldName.Trim() + " <= " + string.Format("{0:MM/dd/yyyy}", oObjComp[iCtr].DateVal);
+                        }
+                    }
+                    else if (oObjComp[iCtr].DataType.Trim() == "C")
+                    {
+                        if (!string.IsNullOrEmpty(oObjComp[iCtr].StrVal))
+                        {
+                            Strcond += " and " + oObjComp[iCtr].Alias.Trim() + oObjComp[iCtr].SqlFldName.Trim() + " = '" + oObjComp[iCtr].StrVal.ToString() + "' ";
+                        }
+                    }
+                }
+                if (oObjComp[iCtr].CriType.Trim() == "CRI/RANGE INPUT")
+                {
+                    if (oObjComp[iCtr].DataType.Trim() == "D")
+                    {
+                        if (oObjComp[iCtr].DateVal.HasValue)
+                        {
+                            //string dateOnlyString = oObjComp[iCtr].DateVal.ToString("d");
+                            if (oObjComp[iCtr].ColName.ToString() == oObjComp[iCtr].SqlFldName.ToString().Trim())
+                            {
+                                Strcond += " and " + oObjComp[iCtr].Alias.Trim() + oObjComp[iCtr].SqlFldName.Trim() + " between ";
+                            }
+
+                            for (int jCtr = 0; jCtr < oObjComp.Count; jCtr++)
+                            {
+                                if (oObjComp[jCtr].ColName.ToString() == oObjComp[iCtr].ColName.ToString())
+                                {
+                                    Strcond += (jCtr > 0) ? " and " : "";
+                                    //Strcond += "'"+ string.Format("{0:MM/dd/yyyy}", oObjComp[iCtr].DateVal) +"'" ;
+                                    Strcond += "'" + string.Format("{0:yyyy/MM/dd}", oObjComp[iCtr].DateVal) + "'";
+                                }						
+                            }
+                        }
+
+                        else
+                        {
+                            oObjComp[iCtr].DateVal = DateTime.Now;
+                            //oObjComp[iCtr].DateVal = DateOnly.FromDateTime(DateTime.Now);
+                            if (oObjComp[iCtr].ColName.ToString() == oObjComp[iCtr].SqlFldName.ToString().Trim())
+                            {
+                                Strcond += " and " + oObjComp[iCtr].Alias.Trim() + oObjComp[iCtr].SqlFldName.Trim() + " between ";
+                            }
+
+                            for (int jCtr = 0; jCtr < oObjComp.Count; jCtr++)
+                            {
+                                if (oObjComp[jCtr].ColName.ToString() == oObjComp[iCtr].ColName.ToString())
+                                {
+                                    Strcond += (jCtr > 0) ? " and " : "";
+                                    //Strcond += "'" + string.Format("{0:MM/dd/yyyy}", oObjComp[iCtr].DateVal) + "'";
+                                    Strcond += "'" + string.Format("{0:yyyy/MM/dd}", oObjComp[iCtr].DateVal) + "'";
+                                }
+                            }
+                        }
+                    }
+                    else if (oObjComp[iCtr].DataType.Trim() == "N")
+                    {
+                        if (oObjComp[iCtr].NumVal != 0)
+                        {
+                            //Strcond += " and " + oObjComp[iCtr].Alias.Trim() + oObjComp[iCtr].SqlFldName.Trim() + " between " + oObjComp[iCtr].NumVal + " and " + oObjComp[iCtr].NumVal;
+                            if (oObjComp[iCtr].ColName.ToString() == oObjComp[iCtr].SqlFldName.ToString().Trim())
+                            {
+                                Strcond += " and " + oObjComp[iCtr].Alias.Trim() + oObjComp[iCtr].SqlFldName.Trim() + " between ";
+                            }
+
+                            for (int jCtr = 0; jCtr < oObjComp.Count; jCtr++)
+                            {
+                                if (oObjComp[jCtr].ColName.ToString() == oObjComp[iCtr].ColName.ToString())
+                                {
+                                    Strcond += (jCtr > 0) ? " and " : "";
+                                    Strcond += oObjComp[jCtr].NumVal.ToString();
+                                }
+                            }
+                        }
+                    }
+                }
+                if (oObjComp[iCtr].CriType.Trim() == "CRI/SELECTION INPUT")
+                {
+                    if (oObjComp[iCtr].DataType.Trim() == "C")
+                    {
+                        if (oObjComp[iCtr].ComboVal != null)
+                        {
+                            Strcond += " and " + oObjComp[iCtr].Alias.Trim() + oObjComp[iCtr].SqlFldName.Trim() + " in ( '" + string.Join("','", oObjComp[iCtr].ComboVal) + "') ";
+                        }
+                    }
+                }
+            }
+        }
+
+        DSRptDevDet.QueryCond = Strcond;
+        myStateContainer.SetValue(DSRptDevDet);
+        navigationManager.NavigateTo("/rptviewer");
+    }
+
+    protected override bool ShouldRender()
+    {
+        return shouldRender;
+    }
+    public async void ShowReportCriteria()
+    {
+        try
+        {
+            DSRptDevDet DSRptDevDet1 = new DSRptDevDet
+		    {
+			    AppType  = DSRptDevDet.AppType,
+			    DeviceId = DSRptDevDet.DeviceId,
+			    ApprType = DSRptDevDet.ApprType,
+			    ReportId = DSRptDevDet.ReportId,
+                MainConnStr = Global.MainDBConnStr,
+                SQLConnStr = Global.PtyDBConnstr
+		    };
+            string json = JsonConvert.SerializeObject(DSRptDevDet1);
+            var response = await RazorFunc.CallAPIAsync(Global.APIURL, "GetRptCriteriaFld", json);
+            var respStatusCode = response.StatusCode;
+            if (respStatusCode.ToString() == "OK")
+            {
+                var responseBody = await response.Content.ReadAsStringAsync();
+                var retJSON = JsonConvert.DeserializeObject<RetJSON>(responseBody);
+
+                if (retJSON.Status.ToString() == "Error")
+                {
+                    await sfDialogService.AlertAsync(retJSON.Msg.ToString() + retJSON.ExError, Global.SfDialogMsg);
+                }
+                else
+                {
+                    Dt = JsonConvert.DeserializeObject<DataTable>(retJSON.Data.ToString().Trim());
+                    bool Criteria = false;
+
+                    for (int iCtr = 0; iCtr < Dt.Rows.Count; iCtr++)
+                    {
+                        System.Data.DataRow row = Dt.Rows[iCtr];
+                        if (row["Criteria"].ToString().Contains("CRI/"))
+                        {
+                            Criteria = true;
+                            break;
+                        }
+                    }
+
+
+                    if (Criteria)
+                    {
+                        Global.RptCriteria = true;
+                        GetDropDownList();
+                        // @if (DSRptDevDet.MultiFirm.ToString().Trim() == "Y")
+                        // {
+                        //     DtaSourceCompIdList();
+                        // }
+                        DynamicRender = CreateComponent(this);
+                    }
+                    else
+                    {
+                        Global.RptCriteria = false;
+                        Global.GrpColNm = new List<string>();
+                        foreach (System.Data.DataRow row in Dt.Rows)
+                        {
+                            if (row["Criteria"].ToString().Trim() == "HIDDEN")
+                            {
+                                HiddenColNm.Add(row["ColName"].ToString());
+                                DSRptDevDet.HiddenCol.Add(row["ColName"].ToString());
+                            }
+                            if (row["Criteria"].ToString().Trim() == "GROUP BY")
+                            {
+                                Global.GrpColNm.Add(row["ColName"].ToString());
+                            }
+                            /*if (row["Criteria"].ToString().Trim() == "SUM")
+                                {
+                                Global.SumColNm.Add(row["ColName"].ToString());
+                            }*/
+                        }
+                        Strcond = " and 1 = 1 ";
+                        DSRptDevDet.QueryCond = Strcond;
+                        myStateContainer.SetValue(DSRptDevDet);
+                        navigationManager.NavigateTo("/rptviewer");
+                    }
+
+                }
+            }
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await sfDialogService.AlertAsync("ShowDashBordData => " + ex.Message, CoreVars.EXERROR);
+        }
+    }
+
+    private async void GetDropDownList()
+    {
+        try
+        {
+            string Query;
+            foreach (System.Data.DataRow row in Dt.Rows)
+            {
+                if (row["Criteria"].ToString().Trim() == "CRI/SELECTION INPUT")
+                {
+                    if (row["ColName"].ToString() == "COMPID")
+                    {
+                        @if (DSRptDevDet.MultiFirm.ToString().Trim() == "Y")
+                        {
+                            DtaSourceCompIdList();
+                        }
+                    }
+                    else
+                    {
+                        string FldName1 = row["ColName"].ToString();
+                        DSRptDevDet.ListColName = row["ColName"].ToString();
+                        DSRptDevDet DSRptDevDet2 = new DSRptDevDet
+                        {
+
+                            DeviceId = DSRptDevDet.DeviceId.Trim(),
+                            ReportId = DSRptDevDet.ReportId,
+                            ListColName = DSRptDevDet.ListColName,
+                            CompIdList = DSRptDevDet.CompIdList.Trim(),
+                            MainDB = DSRptDevDet.MainDB.Trim(),
+                            YearId = DSRptDevDet.YearId.Trim(),
+                            MainConnStr = Global.MainDBConnStr,
+                            SQLConnStr = Global.PtyDBConnstr
+                        };
+                        string json = JsonConvert.SerializeObject(DSRptDevDet2);
+                        var response = await RazorFunc.CallAPIAsync(Global.APIURL, "GetSelectListQry", json);
+                        var respStatusCode = response.StatusCode;
+                        if (respStatusCode.ToString() == "OK")
+                        {
+                            var responseBody = await response.Content.ReadAsStringAsync();
+                            var retJSON = JsonConvert.DeserializeObject<RetJSON>(responseBody);
+
+                            if (retJSON.Status.ToString() == "Error")
+                            {
+                                await sfDialogService.AlertAsync(retJSON.Msg.ToString() + retJSON.ExError, Global.SfDialogMsg);
+                            }
+                            else
+                            {
+                                Dt = JsonConvert.DeserializeObject<DataTable>(retJSON.Data.ToString().Trim());
+                                System.Data.DataRow lstrow;
+                                for (int ictr = 0; ictr < Dt.Rows.Count; ictr++)
+                                {
+                                    lstrow = Dt.Rows[ictr];
+                                    DropDownListObject listObject = new DropDownListObject();
+                                    listObject.ID = lstrow["Name"].ToString().Trim();
+                                    listObject.Text = lstrow["Name"].ToString().Trim();
+                                    DataSource2.Add(listObject);
+                                }
+
+                            }
+                        }
+
+                    }
+                    
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            await sfDialogService.AlertAsync("ShowDashBordData => " + ex.Message, CoreVars.EXERROR);
+        }
+    }
+
+    private async void DtaSourceCompIdList()
+    {
+        oTblData = new GetTableData
+        {
+            Query = " select a.CompanyName as Company, a.CompanyId " +
+                    " from [" + DSRptDevDet.MainDB +"].dbo.Company a " +
+                    " where 1 = 1 and a.Year_ID = '" + DSRptDevDet.YearId + "'" +
+                    " Order by a.CompanyName",
+            SQLConnStr = Global.PtyDBConnstr
+                //DBConnOnServer = "PARTYSERVER"
+
+        };
+        string json = JsonConvert.SerializeObject(oTblData);
+        var response = await RazorFunc.CallAPIAsync(Global.APIURL, "GetTableData", json);
+        var respStatusCode = response.StatusCode;
+        if (respStatusCode.ToString() == "OK")
+        {
+            var responseBody = await response.Content.ReadAsStringAsync();
+            var retJSON = JsonConvert.DeserializeObject<RetJSON>(responseBody);
+            if (retJSON.Status.ToString() == "Error")
+            {
+                await sfDialogService.AlertAsync(retJSON.Msg.ToString() + retJSON.ExError, Global.SfDialogMsg);
+            }
+            else
+            {
+                Dt = JsonConvert.DeserializeObject<DataTable>(retJSON.Data.ToString().Trim());
+                System.Data.DataRow lstrow;
+                for (int ictr = 0; ictr < Dt.Rows.Count; ictr++)
+                {
+                    lstrow = Dt.Rows[ictr];
+                    DropDownListObject listObject = new DropDownListObject();
+                    listObject.ID = lstrow["CompanyId"].ToString().Trim();
+                    listObject.Text = lstrow["Company"].ToString().Trim();
+                    CompList.Add(listObject);
+                }
+            }
+        }
+    }
+
+}

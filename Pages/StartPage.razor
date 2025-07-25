@@ -1,0 +1,105 @@
+@page "/"
+@inject SfDialogService sfDialogService
+@inject NavigationManager navigationManager
+@inject MyStateContainer myStateContainer
+@inject ILocalStorageService _localstorage
+
+@using Newtonsoft.Json
+@using Syncfusion.Blazor.Popups
+@using System.Data
+@using JSCoreLibRazor
+
+@code {
+
+    //protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        CheckDevRegnDBConnAsync();
+    }
+
+    private async void CheckDevRegnDBConnAsync()
+    {
+        try
+        {
+            // SQLConnStr sQLConn = new SQLConnStr { ConnName = "DSDevRegDBConnStr", AppType=Global.AppType };
+            // string json = JsonConvert.SerializeObject(sQLConn);
+            string json = JsonConvert.SerializeObject(Global.MainDBConnStr);
+            var response = await RazorFunc.CallAPIAsync(Global.APIURL, "DSSqlConn", json);
+            var respStatusCode = response.StatusCode;
+            //await sfDialogService.AlertAsync(await _localstorage.GetItemAsync<string>("UserName"), "Local Storage0");
+            if (respStatusCode.ToString() == "OK")
+            {
+                string DeviceIdVal = await _localstorage.GetItemAsync<string>(Global.AppType.ToString().Trim());
+                DSRptDevDet DSRptDevDet = new DSRptDevDet
+                    {
+                        AppType = Global.AppType.ToString(),
+                        DeviceId = (string.IsNullOrEmpty(DeviceIdVal) ? "" : DeviceIdVal)
+                        //DeviceId = await _localstorage.GetItemAsync<string>(Global.AppType.ToString().Trim())
+                };
+                json = JsonConvert.SerializeObject(DSRptDevDet);
+                response = await RazorFunc.CallAPIAsync(Global.APIURL, "ChkDevRegn", json);
+                respStatusCode = response.StatusCode;
+                if (respStatusCode.ToString() == "OK")
+                {
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    var retJSON = JsonConvert.DeserializeObject<RetJSON>(responseBody);
+
+
+                    if (retJSON.Status.ToString() == "Error")
+                    {
+                        await sfDialogService.AlertAsync(retJSON.Msg.ToString() + retJSON.ExError, Global.SfDialogMsg);
+                    }
+                    else
+                    {
+                        string Msg;
+                        if (retJSON.Data.ToString().ToLower() == "in registration process")
+                        {
+                            Msg = "Please wait, Device is still in Registration Process." + '\n' + "Application will exit for now.";
+                            await sfDialogService.AlertAsync(Msg, Global.SfDialogMsg);
+                            Environment.Exit(0);
+                        }
+                        else if (retJSON.Data.ToString().ToLower() == "unregistered")
+                        {
+                            Msg = "Device is not registered with Jupiter Systems." + "\n" + " Please proceed for Registration.";
+                            await sfDialogService.AlertAsync(Msg, Global.SfDialogMsg);
+                            navigationManager.NavigateTo("/regUser");
+					    }
+					    else
+					    {
+						    DataTable Dt = JsonConvert.DeserializeObject<DataTable>(retJSON.Data.ToString().Trim());
+						    System.Data.DataRow row = Dt.Rows[0];
+
+                            DSRptDevDet.PartyId = long.Parse(row["PartyId"].ToString());
+						    DSRptDevDet.ApprType = row["Approval"].ToString().Trim();
+                            DSRptDevDet.DeviceId = row["IMEINo"].ToString().Trim();
+                            DSRptDevDet.AppType = row["AppType"].ToString().Trim();
+						    DSRptDevDet.CompIdList = row["DefDB"].ToString().Trim();
+						    DSRptDevDet.MainDB = row["MainDB"].ToString().Trim();
+						    DSRptDevDet.YearId = row["YearId"].ToString().Trim();
+                            DSRptDevDet.CPerson = row["CPerson"].ToString().Trim();
+                            DSRptDevDet.Party = row["Party"].ToString().Trim();
+                            DSRptDevDet.MobileNo = row["MobileNo"].ToString().Trim();
+
+                            myStateContainer.SetValue(DSRptDevDet);
+                            await _localstorage.SetItemAsync(Global.AppType.ToString().Trim(), DSRptDevDet.DeviceId);
+                            navigationManager.NavigateTo("/login");
+                            //navigationManager.NavigateTo($"dashpgnew/{DSRptDevDet.PartyId}");
+					    }
+                    }
+                }
+                else
+                {
+                    await sfDialogService.AlertAsync(respStatusCode.ToString(), Global.SfDialogMsg);
+                }
+            }
+            else
+            {
+                await sfDialogService.AlertAsync("Not Connect SQLServer", Global.SfDialogMsg);
+            }
+        }
+        catch (Exception ex)
+        {
+            await sfDialogService.AlertAsync("ShowDashBordData => " + ex.Message, CoreVars.EXERROR);
+        }
+    }
+}

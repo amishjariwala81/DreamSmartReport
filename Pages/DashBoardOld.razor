@@ -1,0 +1,538 @@
+@page "/dashB"
+@using Syncfusion.Blazor.DropDowns;
+@inject NavigationManager navigationManager
+@inject SfDialogService sfDialogService
+
+@using System.ComponentModel;
+@using System.ComponentModel.DataAnnotations;
+@using Newtonsoft.Json
+@using Syncfusion.Blazor.DropDowns;
+@using Syncfusion.Blazor.Popups
+@using Syncfusion.Blazor.Grids
+@using System.Data;
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.Spinner
+@using Syncfusion.Blazor.Navigations
+@using Syncfusion.Blazor.Calendars
+@using Syncfusion.Blazor.Buttons
+@using JSCoreLibRazor
+
+
+@**@
+
+
+<div class="table-responsive">
+    <div class="row">
+        <div class="col-md-1">
+            <Syncfusion.Blazor.Buttons.SfButton CssClass="e-medium" IconCss="e-icons e-menu" @onclick="Toggle" style="margin-top:10px">Menu</Syncfusion.Blazor.Buttons.SfButton>
+        </div>
+        <div class="col-md-2">
+            <h3>Jupiter Systems</h3>
+        </div>
+    </div>
+
+
+    <SfTab ID="SfTabMain" ShowCloseButton="true">
+        <TabItems>
+            <TabItem Content="This is Dashboard page">
+                <ChildContent>
+                    <TabHeader Text="Dashboard"></TabHeader>
+                </ChildContent>
+            </TabItem>
+
+            <TabItem Content="This is Item Master Module" >
+                <ChildContent>
+                    <TabHeader Text="Item Master"></TabHeader>
+                </ChildContent>
+            </TabItem>
+        </TabItems>
+    </SfTab>
+    <h1>Dashboard</h1>    
+    <SfSpinner @bind-Visible="@VisibleProperty"></SfSpinner>
+    
+    <SfGrid DataSource="@lstObj" id="Grid" AllowPaging="true" AllowMultiSorting="true" AllowExcelExport="true" RowHeight="25" >
+        <GridEditSettings AllowAdding="true" AllowDeleting="true" AllowEditing="true" Mode="EditMode.Normal" ></GridEditSettings>
+        <GridColumns>
+            @foreach( var stru in TblStru )
+            {
+                if (stru.FldName.ToUpper() == "MSTID")
+                {
+                    <GridColumn Field=@stru.FldName HeaderText=@stru.FldName AllowEditing="false"   Type="ColumnType.Number" Width="100px" IsPrimaryKey="true" Visible="false"/>
+                }
+                else if (stru.DataType == "String")
+                {
+                    if (stru.FldName == "ModType")
+                    {
+                        <GridColumn Field=@stru.FldName HeaderText=@stru.FldName AllowEditing="true" EditType="EditType.DropDownEdit" 
+                            Width="120"></GridColumn>
+                    }
+                    else
+                    {
+                        <GridColumn Field=@stru.FldName HeaderText=@stru.FldName AllowEditing="true" Type="ColumnType.String" EditType="EditType.DefaultEdit"
+                            TextAlign="TextAlign.Left" Width="100px"/>
+                    }
+                    @*<GridColumn Field=@stru.FldName HeaderText=@stru.FldName AllowEditing="true" Type="ColumnType.String" EditType="EditType.DefaultEdit"
+                        TextAlign="TextAlign.Left" Width="100px" />*@
+                }
+                else if (stru.DataType == "Int32")
+                {
+                    <GridColumn Field=@stru.FldName HeaderText=@stru.FldName AllowEditing="true" Type="ColumnType.Number" EditType="EditType.NumericEdit"
+                        TextAlign="TextAlign.Right" Width="100px" />
+                }
+                else if (stru.DataType == "Double")
+                {
+                    <GridColumn Field=@stru.FldName HeaderText=@stru.FldName AllowEditing="true" Type="ColumnType.Number" EditType="EditType.NumericEdit"
+                        TextAlign="TextAlign.Right" Width="100px" />
+                }
+                else if (stru.DataType == "DateTime")
+                {
+                    <GridColumn Field=@stru.FldName HeaderText=@stru.FldName AllowEditing="true" Type="ColumnType.Date" EditType="EditType.DatePickerEdit"
+                        TextAlign="TextAlign.Left" Width="100px" />
+                }
+                else if (stru.DataType == "Boolean")
+                {
+                    <GridColumn Field=@stru.FldName HeaderText=@stru.FldName AllowEditing="true" Type="ColumnType.Boolean" DisplayAsCheckBox="true" 
+                        EditType="EditType.BooleanEdit" Width="100px" />
+                }
+            }
+         </GridColumns>
+    </SfGrid>
+    @CreateComponent()
+
+    <SfSidebar ShowBackdrop="true" Width="250px" @bind-IsOpen="SidebarToggle" >
+        <ChildContent>
+            <div>
+                <span>
+                    <Syncfusion.Blazor.Buttons.SfButton CssClass="e-large" IconCss="e-icons e-close" @onclick="CloseMenu" style="margin-top:10px" >Close</Syncfusion.Blazor.Buttons.SfButton>
+                </span>
+                <SfTreeView TValue="MenuItem">
+                    <TreeViewFieldsSettings TValue="MenuItem" Id="Id" DataSource="@Menu" Text="Item" ParentID ="ParentId" HasChildren="HasSubItem" Expanded="Expanded">
+                    </TreeViewFieldsSettings>
+                    <TreeViewEvents TValue="MenuItem" NodeClicked="NodeClickedHandler"></TreeViewEvents>
+                </SfTreeView>
+
+                <SfComboBox TValue="string" TItem="Games" Placeholder="Select a game" DataSource="@LocalData">
+                    <ComboBoxFieldSettings Value="ID" Text="Text"></ComboBoxFieldSettings>
+                </SfComboBox>
+
+                @*<SfTab ID="SfTab" ShowCloseButton="true">
+                    <TabItems>
+                        <TabItem Content="Twitter is an online social networking service that enables users to send and read short 140-charactermessages called tweets.Registered users can read and post tweets, but those who are unregistered can only readthem.Users access Twitter through the website interface, SMS or mobile device app Twitter Inc. is based in SanFrancisco and has more than 25 offices around the world.Twitter was created in March 2006 by Jack Dorsey,Evan Williams, Biz Stone, and Noah Glass and launched in July 2006. The service rapidly gained worldwide popularity,with more than 100 million users posting 340 million tweets a day in 2012.The service also handled 1.6 billionsearch queries per day.">
+                            <ChildContent>
+                                <TabHeader Text="Twitter"></TabHeader>
+                            </ChildContent>
+                        </TabItem>
+
+                        <TabItem Content="Facebook is an online social networking service headquartered in Menlo Park, California. Its website waslaunched on February 4, 2004, by Mark Zuckerberg with his Harvard College roommates and fellow students EduardoSaverin, Andrew McCollum, Dustin Moskovitz and Chris Hughes.">
+                            <ChildContent>
+                                <TabHeader Text="Facebook"></TabHeader>
+                            </ChildContent>
+                        </TabItem>
+                        <TabItem Content="WhatsApp Messenger is a proprietary cross-platform instant messaging client for smartphones that operatesunder a subscription business model.It uses the Internet to send text messages, images, video, user location andaudio media messages to other users using standard cellular mobile numbers. As of February 2016, WhatsApp had a userbase of up to one billion,[10] making it the most globally popular messaging application.WhatsApp Inc., based inMountain View, California, was acquired by Facebook Inc.on February 19, 2014, for approximately US$19.3 billion.">
+                            <ChildContent>
+                                <TabHeader Text="Whatsapp"></TabHeader>
+                            </ChildContent>
+                        </TabItem>
+                    </TabItems>
+                </SfTab>*@
+            </div>
+        </ChildContent>
+    </SfSidebar>
+</div>
+
+<style>
+    .e-sidebar {
+        background-color: #f8f8f8;
+        color: black;
+    }
+    .text-content {
+        font-size: 1.5rem;
+        padding: 3rem;
+    }
+    .main > div {
+        padding: 0px !important;
+    }
+
+    .e-treeview .e-list-item {
+        line-height: 25px;
+    }
+
+    .e-treeview .e-fullrow {
+        height: 30px;
+    }
+
+    .e-treeview .e-icon-expandable {
+        color: red;
+    }
+
+    .e-treeview .e-icon-collapsible {
+        color: black;
+    }
+
+    .e-treeview .e-list-text {
+        color: black !important;
+    }
+
+    .tree {
+        border: 1px solid black;
+        height: 670px;
+        overflow: scroll;
+    }
+     #e-item-SfTab_0 .e-close-icon
+     {
+        display: none;
+     }
+
+     #e-item-SfTabMain_0 .e-close-icon
+     {
+        display: none;
+     }
+
+</style>
+
+@code {
+    public List<System.Dynamic.ExpandoObject>? lstObj;
+    public DataTable? dataTbl = new DataTable();
+
+    public List<SQLTblFldDef> TblStru = new List<SQLTblFldDef>();
+
+    private bool VisibleProperty { get; set; } = false;
+
+
+    public IEditorSettings OrdNoEditParams = new NumericEditCellParams
+    { 
+        Params = new NumericTextBoxModel<object>() { Min = 0, ShowSpinButton = false, Max = 999999,  Decimals = 2, Format = "n2", ValidateDecimalOnType = true } 
+    };
+
+    public static List<ModType> modTypes = new List<ModType>
+    {
+         new ModType(){ Name="Master"},
+         new ModType(){ Name="Transaction"},
+         new ModType(){ Name="Report"},		
+         new ModType(){ Name="Utility"}
+    };
+
+    public IEditorSettings ModTypeEditParams = new DropDownEditCellParams
+    {
+        Params = new DropDownListModel<object, object>() { DataSource = modTypes, AllowFiltering = true }
+    };
+
+    SfSidebar sidebarObj = new SfSidebar();
+
+    public bool SidebarToggle = false;
+
+    public void CloseMenu()
+    {
+        SidebarToggle = false;
+    }
+
+    public void Toggle()
+    {
+        SidebarToggle = !SidebarToggle;
+    }
+
+    public async void NodeClickedHandler(NodeClickEventArgs args)
+    {
+
+        await sfDialogService.AlertAsync( args.NodeData.Text + " Clicked!!!", "Menu Manager");
+        Toggle();
+    }
+
+    public class MenuItem
+    {
+        public string Id { get; set; }
+        public string ParentId { get; set; } = null;
+        public string Item { get; set; } 
+        public bool Expanded { get; set; }
+        public bool HasSubItem { get; set; }
+    }
+
+    List<MenuItem> Menu = new List<MenuItem>();
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        //Menu.Add(new MenuItem { Id = "1", Item = "Inbox", HasSubItem = true, Expanded = false });
+        //Menu.Add(new MenuItem { Id = "9", Item = "Masters", HasSubItem = true, Expanded = false });
+        //Menu.Add(new MenuItem { Id = "2", ParentId = "1", Item = "Categories", Expanded = false, HasSubItem = true });
+        //Menu.Add(new MenuItem { Id = "6", ParentId = "2", Item = "Primary" });
+        //Menu.Add(new MenuItem { Id = "4", ParentId = "2", Item = "Social" });
+        //Menu.Add(new MenuItem { Id = "5", ParentId = "2", Item = "Promotions" });
+        //Menu.Add(new MenuItem { Id = "10", ParentId = "9", Item = "Item Master" });
+
+        //Menu.Add(new MenuItem { Id = "22", Item = "Masters" , HasSubItem = true});
+        //Menu.Add(new MenuItem { Id = "23", Item = "Transactions" , HasSubItem = true});
+        //Menu.Add(new MenuItem { Id = "1", ParentId = "22", Item = "Item Master" });
+        //Menu.Add(new MenuItem { Id = "2", ParentId = "22", Item = "Plant Master" });
+        //Menu.Add(new MenuItem { Id = "7", ParentId = "23", Item = "Purchase Bill" });
+        //Menu.Add(new MenuItem { Id = "6", ParentId = "22", Item = "Grade Master" });
+
+        //GenerateMenuItems();
+        //Thread.Sleep(5000); 
+
+        VisibleProperty = true;
+        //ClsGetTableData oTblData = new ClsGetTableData
+        //{
+        //    SelectClause = "MstId, Srl, ModName, ModType, OrdNo, Rate, CreateData, AcPost",
+        //    TableName ="ModuleMst"
+        //};
+
+        //string json = JsonConvert.SerializeObject(oTblData);
+        //HttpClient http = new HttpClient();
+        //HttpRequestMessage httpRequestMessage = new HttpRequestMessage();
+        //httpRequestMessage.Method = new HttpMethod("POST");
+        //httpRequestMessage.RequestUri = new Uri("https://localhost:44332/api/GetTableData");
+        //httpRequestMessage.Content = new StringContent(json);
+        //JsonConvert.SerializeObject(oTblData);
+        //httpRequestMessage.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+        //var response = await http.SendAsync(httpRequestMessage);
+        //var respStatusCode = response.StatusCode;
+
+        //if (respStatusCode.ToString() == "OK")
+        //{
+        //    var responseBody = await response.Content.ReadAsStringAsync();
+        //    var retJSON = JsonConvert.DeserializeObject<RetJSON>(responseBody);
+
+        //    if (retJSON.Status.ToString() == "Error")
+        //    {
+        //        await sfDialogService.AlertAsync(retJSON.Msg.ToString(), "User Manager");
+        //    }
+        //    else
+        //    {
+        //        TblStru = JsonConvert.DeserializeObject<List<SQLTblFldDef>>(retJSON.AdtData.ToString().Trim());
+
+        //        dataTbl = JsonConvert.DeserializeObject<DataTable>(retJSON.Data.ToString().Trim());
+        //        //navigationManager.NavigateTo("/dashboard");
+        //        lstObj = new List<System.Dynamic.ExpandoObject>();
+        //        foreach (DataRow row in dataTbl.Rows)
+        //        {
+        //            System.Dynamic.ExpandoObject e = new System.Dynamic.ExpandoObject();
+        //            foreach (DataColumn col in dataTbl.Columns)
+        //            {
+        //                e.TryAdd(col.ColumnName, row.ItemArray[col.Ordinal]);
+        //            }
+        //            lstObj.Add(e);
+        //        }
+        //    }
+        //}
+        //else
+        //{
+        //    await sfDialogService.AlertAsync(response.ReasonPhrase, "User Manager");
+        //}
+        VisibleProperty = false;
+        //return base.OnInitializedAsync();
+    }
+
+    private async void GenerateMenuItems()
+    {
+        GetTableData oTblData = new GetTableData
+        {
+                SelectClause = "admin"
+        };
+
+        string json = JsonConvert.SerializeObject(oTblData);
+        HttpClient http = new HttpClient();
+        HttpRequestMessage httpRequestMessage = new HttpRequestMessage();
+        httpRequestMessage.Method = new HttpMethod("POST");
+        httpRequestMessage.RequestUri = new Uri("https://localhost:44332/api/GetMenuDet");
+        httpRequestMessage.Content = new StringContent(json);
+        JsonConvert.SerializeObject(oTblData);
+        httpRequestMessage.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+        var response = await http.SendAsync(httpRequestMessage);
+        var respStatusCode = response.StatusCode;
+        if (respStatusCode.ToString() == "OK")
+        {
+            var responseBody = await response.Content.ReadAsStringAsync();
+            var retJSON = JsonConvert.DeserializeObject<RetJSON>(responseBody);
+
+            if (retJSON.Status.ToString() == "Error")
+            {
+                await sfDialogService.AlertAsync(retJSON.Msg.ToString(), "Menu Designer");
+            }
+            else
+            {
+                DataTable dataTblMenu = JsonConvert.DeserializeObject<DataTable>(retJSON.Data.ToString().Trim());
+                List<MenuObj> oMenu = new List<MenuObj>();
+                List<string> ParentList = new List<string>();
+
+                oMenu = new List<MenuObj>();
+
+                int index=0;
+                if (dataTblMenu.Rows.Count > 0)
+                {
+                    foreach (DataRow row in dataTblMenu.Rows)
+                    {
+                        oMenu.Add(new MenuObj() { Id = ++index, MenuType = row["DescType"].ToString(), Menu = row["DescName"].ToString() });
+                    }
+                }
+
+                oMenu.Add(new MenuObj() { Id = ++index, MenuType = "Utility>User Utility"   , Menu = "User Manager"             });
+                oMenu.Add(new MenuObj() { Id = ++index, MenuType = "Designer"               , Menu = "Table Designer"           });
+                oMenu.Add(new MenuObj() { Id = ++index, MenuType = "Designer"               , Menu = "ListOf Designer"          });
+                oMenu.Add(new MenuObj() { Id = ++index, MenuType = "Designer"               , Menu = "Module Designer"          });
+                oMenu.Add(new MenuObj() { Id = ++index, MenuType = "Designer"               , Menu = "Report Designer"          });
+                oMenu.Add(new MenuObj() { Id = ++index, MenuType = "Designer"               , Menu = "R & D"                    });
+                oMenu.Add(new MenuObj() { Id = ++index, MenuType = "Utility>Data Utility"   , Menu = "Backup Database"          });
+                oMenu.Add(new MenuObj() { Id = ++index, MenuType = "Utility>User Utility"   , Menu = "Link Module A/c Posting"  });
+
+                List<ParentMenu> parentMenus = new List<ParentMenu>();
+
+                var ParIndex = 0;
+
+                for (int iCtr = 0; iCtr < oMenu.Count; iCtr++)
+                {
+                    if (oMenu[iCtr].MenuType.Contains(">"))
+                    {
+                        var Nodes = oMenu[iCtr].MenuType.Split(">");
+                        for (int NodeCtr = 0; NodeCtr < Nodes.Length; NodeCtr++)
+                        {
+                            ParIndex= parentMenus.FindIndex(p => p.Parent == Nodes[NodeCtr]);
+                            if (ParIndex < 0)
+                            {
+                                parentMenus.Add(new ParentMenu() { Id = ++index, Parent = Nodes[NodeCtr] });
+                            }
+                        }
+                    }
+                    else
+                    {
+                        ParIndex= parentMenus.FindIndex(p => p.Parent == oMenu[iCtr].MenuType);
+                        if (ParIndex < 0)
+                        {
+                            parentMenus.Add(new ParentMenu() { Id = ++index, Parent = oMenu[iCtr].MenuType });
+                        }
+                    }
+                }
+
+                for (int iCtr = 0; iCtr < parentMenus.Count; iCtr++)
+                {
+                    oMenu.Add(new MenuObj() { Id = ++index, Menu = parentMenus[iCtr].Parent});
+                }
+
+                for (int iCtr = 0; iCtr < oMenu.Count; iCtr++)
+                {
+                    if (!string.IsNullOrEmpty(oMenu[iCtr].MenuType))
+                    {
+                        if (oMenu[iCtr].MenuType.Contains(">"))
+                        {
+
+                            var Nodes = oMenu[iCtr].MenuType.Split(">");
+                            ParIndex = oMenu.FindIndex(p => p.Menu == Nodes[Nodes.Length - 1]);
+                            if (ParIndex >= 0)
+                            {
+                                oMenu[iCtr].ParentId = oMenu[ParIndex].Id;
+                            }                           
+                        }
+                        else
+                        {
+                            ParIndex = oMenu.FindIndex(p => p.Menu == oMenu[iCtr].MenuType);
+                            if (ParIndex >= 0)
+                            {
+                                oMenu[iCtr].ParentId = oMenu[ParIndex].Id;
+                            }
+                        }
+                    }
+                }
+
+
+                for (int iCtr = 0; iCtr < oMenu.Count; iCtr++)
+                {
+                    if (string.IsNullOrEmpty(oMenu[iCtr].MenuType))
+                    {
+                        if (oMenu[iCtr].Menu != "Masters" && oMenu[iCtr].Menu != "Transactions" && oMenu[iCtr].Menu != "Reports" && oMenu[iCtr].Menu != "Designer" &&  oMenu[iCtr].Menu != "Utility")
+                        {
+                            for (int jCtr = 0; jCtr < oMenu.Count; jCtr++)
+                            {
+                                if (!string.IsNullOrEmpty(oMenu[jCtr].MenuType))
+                                {
+                                    if (oMenu[jCtr].MenuType.Contains(">" + oMenu[iCtr].Menu))
+                                    {
+                                        oMenu[iCtr].HasSubItem = true;
+
+                                        if (oMenu[jCtr].MenuType.Contains(">"))
+                                        {
+                                            var Nodes = oMenu[jCtr].MenuType.Split(">");
+                                            ParIndex = oMenu.FindIndex(p => p.Menu == Nodes[Nodes.Length - 2]);
+                                            if (ParIndex >= 0)
+                                            {
+                                                oMenu[iCtr].ParentId = oMenu[ParIndex].Id;
+                                            }
+                                        }
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        else { oMenu[iCtr].HasSubItem = true; }
+                    }
+                }
+                List<MenuObj> oOrderedMenu = oMenu.OrderBy(o => o.ParentId).ToList();
+
+                for (int iCtr = 0; iCtr < oOrderedMenu.Count; iCtr++)
+                {
+                    MenuItem menuItem = new MenuItem();
+
+                    menuItem.Id = oOrderedMenu[iCtr].Id.ToString();
+                    menuItem.Expanded = false;
+                    if (!string.IsNullOrEmpty(oOrderedMenu[iCtr].ParentId.ToString()) && oOrderedMenu[iCtr].ParentId.ToString()!="0")
+                    {
+                        menuItem.ParentId = oOrderedMenu[iCtr].ParentId.ToString();
+                    }
+                    if (oOrderedMenu[iCtr].HasSubItem)
+                    {
+                        menuItem.HasSubItem = true;    
+                    }
+                    menuItem.Item = oOrderedMenu[iCtr].Menu.ToString();
+                    Menu.Add(menuItem);
+
+                }
+            }
+        }
+        else
+        {
+            await sfDialogService.AlertAsync(response.ReasonPhrase, "User Manager");
+        }
+    }
+
+    public RenderFragment CreateComponent() => builder =>
+    {
+        builder.OpenComponent(0,typeof(SfTextBox));
+        builder.AddAttribute(11, "Name", "JStxt");
+        builder.CloseComponent();
+
+        builder.OpenComponent(1, typeof(SfNumericTextBox<decimal?>));
+        builder.AddAttribute(12, "Name", "JSNum");
+        builder.CloseComponent();
+
+        builder.OpenComponent(5, typeof(SfDatePicker<DateTime>));
+        builder.AddAttribute(13, "Name", "Date");
+        builder.CloseComponent();
+
+        //builder.OpenComponent(2, typeof(SfGrid<T>));
+        //builder.CloseComponent();
+    };
+
+    public class Games
+    {
+        public string ID { get; set; }
+        public string Text { get; set; }
+    }
+    List<Games> LocalData = new List<Games> {
+    new Games() { ID= "Game1", Text= "American Football" },
+    new Games() { ID= "Game2", Text= "Badminton" },
+    new Games() { ID= "Game3", Text= "Basketball" },
+    new Games() { ID= "Game4", Text= "Cricket" },
+    new Games() { ID= "Game5", Text= "Football" },
+    new Games() { ID= "Game6", Text= "Golf" },
+    new Games() { ID= "Game7", Text= "Hockey" },
+    new Games() { ID= "Game8", Text= "Rugby"},
+    new Games() { ID= "Game9", Text= "Snooker" },
+    new Games() { ID= "Game10", Text= "Tennis"},
+  };
+
+}
+
+@*//Menu.Add(new MenuItem { Id = "1", Item = "Inbox", HasSubItem = true, Expanded = true });
+//Menu.Add(new MenuItem { Id = "2", ParentId = "1", Item = "Categories", Expanded = true, HasSubItem = true });
+//Menu.Add(new MenuItem { Id = "3", ParentId = "2", Item = "Primary" });
+//Menu.Add(new MenuItem { Id = "4", ParentId = "2", Item = "Social" });
+//Menu.Add(new MenuItem { Id = "5", ParentId = "2", Item = "Promotions" });*@

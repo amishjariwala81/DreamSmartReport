@@ -1,0 +1,98 @@
+@page "/exitmodalview"
+
+@inject NavigationManager navigationManager
+@inject SfDialogService sfDialogService
+@inject MyStateContainer myStateContainer
+@inject IJSRuntime jsRuntime
+
+@using Newtonsoft.Json
+@using Syncfusion.Blazor.Popups
+@using Syncfusion.Blazor.Grids
+@using JSCoreLibRazor
+
+<!-- Modal2 : start -->
+    <div class="modal fade" id="exampleModalOne" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-body text-center py-4">
+                    <h5>Are you sure?</h5>
+                    <p>Logout and Exit from the app.</p>
+                </div>
+                <div class="modal-footer d-flex align-content-center justify-content-between flex-nowrap">
+                    <button type="button" class="btn btn-light w-50" data-bs-dismiss="modal">No</button>
+                <button type="button" class="btn btn-primary w-50" @onclick="UserActivityLog">Exit</button>
+                    @* <button type="button" class="btn btn-primary w-50" onclick="@Global.ExitApp">Exit</button> *@
+                @*<button type="button" class="btn btn-primary w-50" onclick="JavaScript:window.close()">Exit</button>*@
+                </div>
+            </div>
+        </div>
+    </div>
+<!-- Modal2 : end -->
+
+@code {
+
+    private DSRptDevDet DSRptDevDet;
+  
+    protected override async Task OnInitializedAsync()
+    {
+        DSRptDevDet = myStateContainer.Value;
+    }
+    private async void UserActivityLog()
+    {
+        try
+        {
+            List<AllRowValue> allRowValues = new List<AllRowValue>();
+            List<RowValue> RowData = new List<RowValue>();
+
+            RowData.Add(new RowValue { FldName = "MobileNo", FldValue = long.Parse(DSRptDevDet.MobileNo.ToString()) });
+            //RowData.Add(new RowValue { FldName = "Date", FldValue = RazorFunc.ConvertDate(DateTime.Now.Date.ToString("dd/MM/yyyy HH:mm:ss")) });
+            RowData.Add(new RowValue { FldName = "Date", FldValue = RazorFunc.ConvertDate(DateTime.Now.Date.ToString()) });
+
+            RowData.Add(new RowValue { FldName = "Time", FldValue = DateTime.Now.ToString("HH:mm") });
+            RowData.Add(new RowValue { FldName = "AppType", FldValue = Global.AppType });
+            RowData.Add(new RowValue { FldName = "PtyNm", FldValue = DSRptDevDet.Party.ToString() });
+            RowData.Add(new RowValue { FldName = "UserName", FldValue = DSRptDevDet.CPerson.ToString() });
+            RowData.Add(new RowValue { FldName = "UserRole", FldValue = DSRptDevDet.UserRole.ToString() });
+            RowData.Add(new RowValue { FldName = "LogAct", FldValue = "End" });
+            RowData.Add(new RowValue { FldName = "AppVer", FldValue = Global.AppVersion.ToString() });
+
+            AllRowValue allRowValue = new AllRowValue
+            {
+                AllRowValues = RowData
+            };
+            allRowValues.Add(allRowValue);
+
+            if (allRowValues.Count > 0)
+            {
+                SaveDataObj saveDataObj = new SaveDataObj
+                {
+                    MstTblRowData = allRowValues,
+                    MstTable = "LogInDet",
+                    nAddEdit = 1,
+                    DelSaveWhrCondFldVal = ""
+                };
+                string json = JsonConvert.SerializeObject(saveDataObj);
+                var response = await RazorFunc.CallAPIAsync(Global.APIURL, "SaveData", json);
+                var respStatusCode = response.StatusCode;
+                if (respStatusCode.ToString() == "OK")
+                {
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    var retJSON = JsonConvert.DeserializeObject<RetJSON>(responseBody);
+
+                    if (retJSON.Status.ToString() == "Error")
+                    {
+                        await sfDialogService.AlertAsync(retJSON.Msg.ToString(), "OK");
+                    }
+                    else
+                    {
+                        Global.ExitApp();
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            await sfDialogService.AlertAsync("UserActivityLog => " + ex.Message, CoreVars.EXERROR);
+        }
+    }
+}

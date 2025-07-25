@@ -1,0 +1,133 @@
+@page "/chngPin"
+
+@inject NavigationManager navigationManagerx
+@inject SfDialogService sfDialogService
+@inject MyStateContainer myStateContainer
+
+@using Newtonsoft.Json
+@using Syncfusion.Blazor.Popups
+@using Syncfusion.Blazor.Grids
+@using JSCoreLibRazor
+
+
+<div id="page" class="page">
+
+    <!-- Header : start -->
+    <header class="header">
+        <div class="site-brand">
+            <img src="/Images/logo.png" />
+        </div>
+
+        <div class="header-title">
+            <h1>DreamSmart</h1>
+        </div>
+
+        <div class="header-icons">
+            <a class="icon" href="#" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                @* <img src="/Images/icon-header-support.svg" /> *@
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M27.1934 12.8609C25.7792 11.4377 23.9743 10.4664 22.0074 10.0701C20.0405 9.67392 18.0003 9.8706 16.1453 10.6353C14.2903 11.3999 12.7042 12.6981 11.5879 14.3653C10.4716 16.0325 9.87543 17.9936 9.875 20V25.25C9.875 25.9462 10.1516 26.6139 10.6438 27.1062C11.1361 27.5984 11.8038 27.875 12.5 27.875H14C14.6962 27.875 15.3639 27.5984 15.8562 27.1062C16.3484 26.6139 16.625 25.9462 16.625 25.25V21.5C16.625 20.8038 16.3484 20.1361 15.8562 19.6438C15.3639 19.1516 14.6962 18.875 14 18.875H12.2038C12.4753 17.0008 13.4126 15.2871 14.8443 14.0475C16.276 12.808 18.1063 12.1255 20 12.125H20.06C21.9453 12.1331 23.7647 12.8197 25.1853 14.0592C26.6059 15.2986 27.5327 17.0082 27.7963 18.875H26C25.3038 18.875 24.6361 19.1516 24.1438 19.6438C23.6516 20.1361 23.375 20.8038 23.375 21.5V25.25C23.375 25.9462 23.6516 26.6139 24.1438 27.1062C24.6361 27.5984 25.3038 27.875 26 27.875H27.8375C27.7511 28.2985 27.5209 28.6791 27.1861 28.9525C26.8512 29.2258 26.4322 29.3751 26 29.375H20.75C20.4516 29.375 20.1655 29.4935 19.9545 29.7045C19.7435 29.9155 19.625 30.2016 19.625 30.5C19.625 30.7984 19.7435 31.0845 19.9545 31.2955C20.1655 31.5065 20.4516 31.625 20.75 31.625H26C27.0936 31.6238 28.1421 31.1888 28.9154 30.4154C29.6888 29.6421 30.1238 28.5936 30.125 27.5V20C30.1302 18.6757 29.8739 17.3633 29.3708 16.1383C28.8677 14.9132 28.1278 13.7995 27.1934 12.8609ZM14 21.125C14.0995 21.125 14.1948 21.1645 14.2652 21.2348C14.3355 21.3052 14.375 21.4005 14.375 21.5V25.25C14.375 25.3495 14.3355 25.4448 14.2652 25.5152C14.1948 25.5855 14.0995 25.625 14 25.625H12.5C12.4005 25.625 12.3052 25.5855 12.2348 25.5152C12.1645 25.4448 12.125 25.3495 12.125 25.25V21.125H14ZM25.625 25.25V21.5C25.625 21.4005 25.6645 21.3052 25.7348 21.2348C25.8052 21.1645 25.9005 21.125 26 21.125H27.875V25.625H26C25.9005 25.625 25.8052 25.5855 25.7348 25.5152C25.6645 25.4448 25.625 25.3495 25.625 25.25Z" fill="white" /></svg>
+            </a>
+            <a class="icon" href="#" data-bs-toggle="modal" data-bs-target="#exampleModalOne">
+                @* <img src="/Images/icon-header-exit.svg" /> *@
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18.875 20V12.5C18.875 12.2016 18.9935 11.9155 19.2045 11.7045C19.4155 11.4935 19.7016 11.375 20 11.375C20.2984 11.375 20.5845 11.4935 20.7955 11.7045C21.0065 11.9155 21.125 12.2016 21.125 12.5V20C21.125 20.2984 21.0065 20.5845 20.7955 20.7955C20.5845 21.0065 20.2984 21.125 20 21.125C19.7016 21.125 19.4155 21.0065 19.2045 20.7955C18.9935 20.5845 18.875 20.2984 18.875 20ZM25.1141 12.3125C24.8643 12.1587 24.5642 12.1085 24.278 12.1727C23.9917 12.2369 23.7419 12.4104 23.5817 12.6562C23.4215 12.902 23.3637 13.2006 23.4205 13.4884C23.4774 13.7762 23.6444 14.0304 23.8859 14.1969C25.9447 15.5347 27.125 17.6562 27.125 20C27.125 21.8897 26.3743 23.7019 25.0381 25.0381C23.7019 26.3743 21.8897 27.125 20 27.125C18.1103 27.125 16.2981 26.3743 14.9619 25.0381C13.6257 23.7019 12.875 21.8897 12.875 20C12.875 17.6562 14.0553 15.5347 16.1141 14.1922C16.3428 14.0208 16.4977 13.7687 16.5473 13.4872C16.5969 13.2057 16.5375 12.9159 16.3812 12.6766C16.2248 12.4373 15.9833 12.2665 15.7055 12.1989C15.4278 12.1313 15.1348 12.1719 14.8859 12.3125C12.1775 14.0731 10.625 16.8772 10.625 20C10.625 22.4864 11.6127 24.871 13.3709 26.6291C15.129 28.3873 17.5136 29.375 20 29.375C22.4864 29.375 24.871 28.3873 26.6291 26.6291C28.3873 24.871 29.375 22.4864 29.375 20C29.375 16.8772 27.8225 14.0731 25.1141 12.3125Z" fill="white" /></svg>
+            </a>
+        </div>
+    </header>
+    <!-- Header : end -->
+    <!-- Content : start -->
+    <section class="section content px-4">
+        <h2 class="page-title">Change Pin</h2>
+
+        <Form id="" class="login-form d-flex flex-column">
+            <div class="mb-3 text-center">
+                <label for="" class="form-label">Set 4 digit new Pin</label>
+                <input type="password" id="" class="form-control form-control-passcode" @bind="@PinVal" maxlength="4" required
+                       placeholder="----" style="font-weight:bold" pattern="[0-9]*" inputmode="numeric">
+            </div>
+
+            <button type="button" class="btn btn-primary mb-4" @onclick="ChangeUserPin">
+                Change Pin
+            </button>
+
+            <div class="mb-4 text-center">
+                OR
+            </div>
+
+            <a class="btn btn-light" onclick="@OnClickGoDash">Go to Dashboard</a>
+        </Form>
+    </section>
+    <!-- Content : end -->
+    <!-- Modal : start -->
+        <HelpDesk></HelpDesk>
+    <!-- Modal : end -->
+    <!-- Modal2 : start -->
+    <ExitModal></ExitModal>
+    <!-- Modal2 : end -->
+</div>
+
+
+@code {
+
+    public string PinVal ="";
+    private DSRptDevDet DSRptDevDet;
+    //private bool shouldRender = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        DSRptDevDet = myStateContainer.Value;
+//        StateHasChanged();
+    }
+
+    public void OnClickGoDash()
+    {
+        navigationManagerx.NavigateTo("/dashpgnew");
+    }
+    private async void ChangeUserPin()
+    {
+        try
+        {
+            if (PinVal.Length == 4)
+            {
+                Login login = new Login()
+                {
+                    TblName = "DeviceRegister",
+                    PasswordFld = "Pin",
+                    PasswordVal = PinVal,
+                    UserNameFld = "IMEINo",
+                    UserNameVal = DSRptDevDet.DeviceId.ToString().Trim(),
+                    AppType = Global.AppType.ToString().Trim(),
+                    SQLConnStr = Global.MainDBConnStr
+                };
+
+                string jsonVal = JsonConvert.SerializeObject(login);
+                var response = await  RazorFunc.CallAPIAsync(Global.APIURL, "ChngPwd", jsonVal);
+                var respStatusCode = response.StatusCode;
+                if (respStatusCode.ToString() == "OK")
+                {
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    var retJSON = JsonConvert.DeserializeObject<RetJSON>(responseBody);
+
+                    if (retJSON.Status.ToString() == "Error")
+                    {
+                        await sfDialogService.AlertAsync(retJSON.Msg.ToString() + retJSON.ExError, Global.SfDialogMsg);
+                    }
+                    else
+                    {
+                       // shouldRender = false;
+                        await sfDialogService.AlertAsync(retJSON.Msg.ToString(), Global.SfDialogMsg);
+                        navigationManagerx.NavigateTo("/login");
+                    }
+                }
+                else
+                {
+                    await sfDialogService.AlertAsync(response.ReasonPhrase, Global.SfDialogMsg);
+                }
+                //StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            await sfDialogService.AlertAsync("ShowDashBordData => " + ex.Message, CoreVars.EXERROR);
+        }
+    }
+}
