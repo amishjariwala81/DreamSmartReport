@@ -487,49 +487,6 @@
             await sfDialogService.AlertAsync(ex.Message + ex.InnerException);
         }
     }
-    // private async void onClickPDFMail(MouseEventArgs args)
-    // {
-
-    // string senderAddress = "kp@jupitersystems.in";
-    // string receiverAddress = "amish@jupitersystems.in";
-    // string subject = "Test email with attachment";
-    // string body = "This is a test email with attachment.";
-    // string attachmentFilePath = @"D:\SALES.pdf";
-
-    // AmazonSimpleEmailServiceClient client = new AmazonSimpleEmailServiceClient(
-    //     "AKIA4VEGFX5SRP7XATKU",
-    //     "fJRfuY3YHZRQ1FF5W8HyaFrPcrEYOqgoePj8CnbF",
-    //     RegionEndpoint.APSouth1);
-
-    // var bodyBuilder = new BodyBuilder();
-
-    // bodyBuilder.HtmlBody = body;
-    // bodyBuilder.TextBody = body;
-    // using (FileStream fileStream = new FileStream(attachmentFilePath, FileMode.Open, FileAccess.Read))
-    // {
-    //     bodyBuilder.Attachments.Add(attachmentFilePath, fileStream);
-    // }
-    // var mimeMessage = new MimeMessage();
-    // mimeMessage.From.Add(new MailboxAddress("From Name", senderAddress));
-    // mimeMessage.To.Add(new MailboxAddress("Recipient Name", receiverAddress));
-    // mimeMessage.Subject = subject;
-    // mimeMessage.Body = bodyBuilder.ToMessageBody();
-
-    // using (var messageStream = new MemoryStream())
-    // {
-    //     await mimeMessage.WriteToAsync(messageStream);
-    //     var sendRequest = new SendRawEmailRequest { RawMessage = new RawMessage(messageStream) };
-    //     var response = await client.SendRawEmailAsync(sendRequest);
-    // }
-    // Console.WriteLine("Email Successfully Sent");
-    // sfDialogService.AlertAsync("Mail PDF File successfully");
-    // }
-    // private void OnButtonClick()
-    // {
-
-    //     //JsRuntime.InvokeVoidAsync($"window.Close");
-    // }
-
     private async void ShowReportData()
     {
         try
